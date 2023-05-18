@@ -10,13 +10,13 @@ public class GyroChecker : MonoBehaviour
 {
 
     [SerializeField]
-    Text te;
+    TMPro.TMP_Text te;
 
 
     [SerializeField]
     GameObject textPrefab;
 
-
+    Transform myTransform;
 
     [SerializeField]
     SpriteRenderer tab1;
@@ -69,8 +69,17 @@ public class GyroChecker : MonoBehaviour
 
     bool inMenu = false;
 
+    bool isCameraMoving = false;
+    float destinationX;
+    [SerializeField]
+    float cameraShift;
+    [SerializeField]
+    float cameraVelocty;
+
     void Start()
     {
+        myTransform = transform;
+
         songGenerator = GetComponent<SongGenerator>();
 
         tabScript1 = tab1Transform.GetComponent<TabScript>();
@@ -93,49 +102,47 @@ public class GyroChecker : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Vector3 acc = Input.acceleration;
+
+        HState prevHState = hState;
+        VState prevVstate = vState;
+
+        if (acc.x < inStraightAccuracy && hState == HState.right)
+        {
+            hState = HState.straight;
+        }
+        else if (acc.x > -inStraightAccuracy && hState == HState.left)
+        {
+            hState = HState.straight;
+        }
+        else if (acc.x > inSideAccuracy && hState == HState.straight)
+        {
+            hState = HState.right;
+        }
+        else if (acc.x < -inSideAccuracy && hState == HState.straight)
+        {
+            hState = HState.left;
+        }
+
+        if (acc.y < inStraightAccuracy && vState == VState.up)
+        {
+            vState = VState.straight;
+        }
+        else if (acc.y > -inStraightAccuracy && vState == VState.down)
+        {
+            vState = VState.straight;
+        }
+        else if (acc.y > inSideAccuracy && vState == VState.straight)
+        {
+            vState = VState.up;
+        }
+        else if (acc.y < -inSideAccuracy && vState == VState.straight)
+        {
+            vState = VState.down;
+        }
+
         if (!inMenu)
         {
-
-            Vector3 acc = Input.acceleration;
-            //t.text = Input.acceleration.ToString();
-            //t.text = gyroData.ToString();
-
-            HState prevHState = hState;
-            VState prevVstate = vState;
-
-            if (acc.x < inStraightAccuracy && hState == HState.right)
-            {
-                hState = HState.straight;
-            }
-            else if (acc.x > -inStraightAccuracy && hState == HState.left)
-            {
-                hState = HState.straight;
-            }
-            else if (acc.x > inSideAccuracy && hState == HState.straight)
-            {
-                hState = HState.right;
-            }
-            else if (acc.x < -inSideAccuracy && hState == HState.straight)
-            {
-                hState = HState.left;
-            }
-
-            if (acc.y < inStraightAccuracy && vState == VState.up)
-            {
-                vState = VState.straight;
-            }
-            else if (acc.y > -inStraightAccuracy && vState == VState.down)
-            {
-                vState = VState.straight;
-            }
-            else if (acc.y > inSideAccuracy && vState == VState.straight)
-            {
-                vState = VState.up;
-            }
-            else if (acc.y < -inSideAccuracy && vState == VState.straight)
-            {
-                vState = VState.down;
-            }
 
             if (prevVstate == VState.straight && vState == VState.up)
             {
@@ -261,6 +268,14 @@ public class GyroChecker : MonoBehaviour
                 }
             }
 
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                TouchTab(tabScript1, new Vector3(0, 0, -2));
+            }
+            if (Input.GetKeyDown(KeyCode.X))
+            {
+                TouchTab(tabScript2, new Vector3(0, 0, -2));
+            }
 
             if (Input.touchCount > 0)
             {
@@ -269,75 +284,18 @@ public class GyroChecker : MonoBehaviour
                 {
                     if (t.phase == TouchPhase.Began)
                     {
-                        Vector2 pos = Camera.main.ScreenToWorldPoint(t.position);
-                        if (pos.x < (tab1Transform.position.x + (3.5 / 2f)) && pos.x > (tab1Transform.position.x - (3.5 / 2f)) &&
-                            pos.y < (tab1Transform.position.y + (3.5 / 2f)) && pos.y > (tab1Transform.position.y - (3.5 / 2f)))
+                        Vector2 pos = -Camera.main.ScreenToWorldPoint(new Vector3(t.position.x, t.position.y, -9));
+                        Vector3 tab1Scale = tab1Transform.localScale;
+                        Vector3 tab2Scale = tab2Transform.localScale;
+                        if (pos.x < (tab1Transform.position.x + (tab1Scale.x / 2f)) && pos.x > (tab1Transform.position.x - (tab1Scale.x / 2f)) &&
+                            pos.y < (tab1Transform.position.y + (tab1Scale.y / 2f)) && pos.y > (tab1Transform.position.y - (tab1Scale.y / 2f)))
                         {
-                            if (tabScript1.notesInJudgementZone.Count != 0)
-                            {
-                                tabScript1.TapIncrease(true);
-                                List<GameObject> candidatesSorted = tabScript1.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
-                                candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>().Anihilate();
-
-                                ++combo;
-                                if (combo < 10)
-                                    ++score;
-                                else if (combo < 50)
-                                    score += 2;
-                                else
-                                    score += 3;
-
-                                if (combo >= 10)
-                                {
-                                    PrintNote("Combo x" + combo.ToString(), pos);
-                                }
-                                else
-                                {
-                                    PrintNote("Amazing!", pos);
-                                }
-                                te.text = "score: " + score.ToString();
-                            }
-                            else
-                            {
-                                tabScript1.TapIncrease(false);
-                                PrintNote("Missed!", pos);
-                                combo = 0;
-                            }
+                            TouchTab(tabScript1, pos);
                         }
-                        if (pos.x < (tab2Transform.position.x + (3.5 / 2f)) && pos.x > (tab2Transform.position.x - (3.5 / 2f)) &&
-                            pos.y < (tab2Transform.position.y + (3.5 / 2f)) && pos.y > (tab2Transform.position.y - (3.5 / 2f)))
+                        if (pos.x < (tab2Transform.position.x + (tab2Scale.x / 2f)) && pos.x > (tab2Transform.position.x - (tab2Scale.x / 2f)) &&
+                            pos.y < (tab2Transform.position.y + (tab2Scale.y / 2f)) && pos.y > (tab2Transform.position.y - (tab2Scale.y / 2f)))
                         {
-
-                            if (tabScript2.notesInJudgementZone.Count != 0)
-                            {
-                                tabScript2.TapIncrease(true);
-                                List<GameObject> candidatesSorted = tabScript2.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
-                                candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>().Anihilate();
-
-                                ++combo;
-                                if (combo < 10)
-                                    ++score;
-                                else if (combo < 50)
-                                    score += 2;
-                                else
-                                    score += 3;
-
-                                if (combo >= 10)
-                                {
-                                    PrintNote("Combo x" + combo.ToString(), pos);
-                                }
-                                else
-                                {
-                                    PrintNote("Amazing!", pos);
-                                }
-                                te.text = "score: " + score.ToString();
-                            }
-                            else
-                            {
-                                tabScript2.TapIncrease(false);
-                                PrintNote("Missed!", pos);
-                                combo = 0;
-                            }
+                            TouchTab(tabScript2, pos);
                         }
                     }
                 }
@@ -347,6 +305,25 @@ public class GyroChecker : MonoBehaviour
         }
         else
         {
+            if (isCameraMoving)
+            {
+                myTransform.position += Vector3.right * (destinationX - myTransform.position.x) * cameraVelocty * Time.deltaTime;
+                if (Mathf.Abs(myTransform.position.x - destinationX) < 0.05f)
+                {
+                    myTransform.position = new Vector3(destinationX, myTransform.position.y, myTransform.position.z);
+                    isCameraMoving = false;
+                }
+            }
+
+            tab1Transform.rotation = Quaternion.Euler(-acc.y * 25f, -acc.x * 25f, 0);
+
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                tabScript1.TapIncrease(true);
+                ExitMenu();
+                songGenerator.StartSong();
+            }
+
             if (Input.touchCount > 0)
             {
                 Touch[] touches = Input.touches;
@@ -354,9 +331,10 @@ public class GyroChecker : MonoBehaviour
                 {
                     if (t.phase == TouchPhase.Began)
                     {
-                        Vector2 pos = Camera.main.ScreenToWorldPoint(t.position);
-                        if (pos.x < (tab1Transform.position.x + (3.5 / 2f)) && pos.x > (tab1Transform.position.x - (3.5 / 2f)) &&
-                            pos.y < (tab1Transform.position.y + (3.5 / 2f)) && pos.y > (tab1Transform.position.y - (3.5 / 2f)))
+                        Vector2 pos = -Camera.main.ScreenToWorldPoint(new Vector3(t.position.x, t.position.y, -9));
+                        Vector3 tab1Scale = tab1Transform.localScale;
+                        if (pos.x < (tab1Transform.position.x + (tab1Scale.x / 2f)) && pos.x > (tab1Transform.position.x - (tab1Scale.x / 2f)) &&
+                            pos.y < (tab1Transform.position.y + (tab1Scale.y / 2f)) && pos.y > (tab1Transform.position.y - (tab1Scale.y / 2f)))
                         {
                             tabScript1.TapIncrease(true);
                             ExitMenu();
@@ -364,6 +342,17 @@ public class GyroChecker : MonoBehaviour
                         }
                     }
                 }
+            }
+
+
+            if (prevHState == HState.straight && hState == HState.left)
+            {
+                if(!isCameraMoving) CameraMove(-1);
+            }
+
+            if (prevHState == HState.straight && hState == HState.right)
+            {
+                if(!isCameraMoving) CameraMove(1);
             }
         }
     }
@@ -374,7 +363,7 @@ public class GyroChecker : MonoBehaviour
         GameObject textObject = Instantiate(textPrefab, pos, Quaternion.identity, canvas.transform);
         Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(Camera.main, pos);
         textObject.GetComponent<RectTransform>().anchoredPosition = screenPoint - canvas.GetComponent<RectTransform>().sizeDelta / 2f;
-        textObject.GetComponent<Text>().text = content;
+        textObject.GetComponent<TMPro.TMP_Text>().text = content;
     }
     void ExitMenu()
     {
@@ -397,16 +386,57 @@ public class GyroChecker : MonoBehaviour
             bestScore = score;
         }
         if(bestScore >= 491) 
-            BestScoreTextObject.GetComponent<Text>().text = "Best score:\n" + bestScore + " (A+)";
+            BestScoreTextObject.GetComponent<TMPro.TMP_Text>().text = "record: " + bestScore + " (A+)";
         else if (bestScore > 400)
-            BestScoreTextObject.GetComponent<Text>().text = "Best score:\n" + bestScore + " (A)";
+            BestScoreTextObject.GetComponent<TMPro.TMP_Text>().text = "record: " + bestScore + " (A)";
         else if (bestScore > 350)
-            BestScoreTextObject.GetComponent<Text>().text = "Best score:\n" + bestScore + "(B)";
+            BestScoreTextObject.GetComponent<TMPro.TMP_Text>().text = "record: " + bestScore + " (B)";
         else if (bestScore > 300)
-            BestScoreTextObject.GetComponent<Text>().text = "Best score:\n" + bestScore + "(C)";
+            BestScoreTextObject.GetComponent<TMPro.TMP_Text>().text = "record: " + bestScore + " (C)";
         else
-            BestScoreTextObject.GetComponent<Text>().text = "Best score:\n" + bestScore;
+            BestScoreTextObject.GetComponent<TMPro.TMP_Text>().text = "record: " + bestScore;
         inMenu = true;
+
+    }
+
+    public void TouchTab(TabScript tabScript, Vector3 pos)
+    {
+        if (tabScript.notesInJudgementZone.Count != 0)
+        {
+            tabScript.TapIncrease(true);
+            List<GameObject> candidatesSorted = tabScript.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+            candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>().Anihilate();
+
+            ++combo;
+            if (combo < 10)
+                ++score;
+            else if (combo < 50)
+                score += 2;
+            else
+                score += 3;
+
+            if (combo >= 10)
+            {
+                PrintNote("Combo x" + combo.ToString(), pos);
+            }
+            else
+            {
+                PrintNote("Amazing!", pos);
+            }
+            te.text = "score: " + score.ToString();
+        }
+        else
+        {
+            tabScript.TapIncrease(false);
+            PrintNote("Missed!", pos);
+            combo = 0;
+        }
+    }
+
+    void CameraMove(int dir)
+    {
+        isCameraMoving = true;
+        destinationX = myTransform.position.x + cameraShift * dir;
     }
 
 }

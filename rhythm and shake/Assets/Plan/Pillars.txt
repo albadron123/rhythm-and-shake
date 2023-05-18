@@ -1,0 +1,11 @@
+Core pillars of "Rhythm & Shake":
+
+-- Player communication
+Each player should feel the desire to play this game not alone but his friends and I should support players with their will of communication.
+It should be represented in game design as well as in the community building
+-- Accurate feedback
+In a rhythm game it's vital to show how well the person is playing and how and when he should improve, so it should be clear how the player
+is performing
+-- Player's creativity
+It's important to give a player multiple ways to express himself. it the way he performs the level, in the way he shares the level, in the way he 
+builds levels.
