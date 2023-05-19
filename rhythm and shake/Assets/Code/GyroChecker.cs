@@ -347,12 +347,12 @@ public class GyroChecker : MonoBehaviour
 
             if (prevHState == HState.straight && hState == HState.left)
             {
-                if(!isCameraMoving) CameraMove(-1);
+                if(!isCameraMoving || Mathf.Abs(destinationX-myTransform.position.x) < (cameraShift/4f)) CameraMove(-1);
             }
 
             if (prevHState == HState.straight && hState == HState.right)
             {
-                if(!isCameraMoving) CameraMove(1);
+                if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f)) CameraMove(1);
             }
         }
     }
@@ -437,6 +437,12 @@ public class GyroChecker : MonoBehaviour
     {
         isCameraMoving = true;
         destinationX = myTransform.position.x + cameraShift * dir;
+    }
+
+    void PreFinishCameraMove()
+    {
+        isCameraMoving = false;
+        myTransform.position = new Vector3(destinationX, myTransform.position.y, myTransform.position.z);
     }
 
 }
