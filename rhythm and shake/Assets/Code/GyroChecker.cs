@@ -8,9 +8,19 @@ using UnityEngine.UI;
 
 public class GyroChecker : MonoBehaviour
 {
+    [SerializeField]
+    List<Song> songs = new List<Song>();
+    int currentSongIndex = 1;
+
 
     [SerializeField]
     TMPro.TMP_Text te;
+
+    [SerializeField]
+    TMPro.TMP_Text SongNameText;
+    [SerializeField]
+    TMPro.TMP_Text SongAuthorText;
+
 
 
     [SerializeField]
@@ -347,12 +357,18 @@ public class GyroChecker : MonoBehaviour
 
             if (prevHState == HState.straight && hState == HState.left)
             {
-                if(!isCameraMoving || Mathf.Abs(destinationX-myTransform.position.x) < (cameraShift/4f)) CameraMove(-1);
+                if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f))
+                {
+                    ForceChangeSong(-1);
+                }
             }
 
             if (prevHState == HState.straight && hState == HState.right)
             {
-                if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f)) CameraMove(1);
+                if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f))
+                {
+                    ForceChangeSong(1);
+                }
             }
         }
     }
@@ -443,6 +459,36 @@ public class GyroChecker : MonoBehaviour
     {
         isCameraMoving = false;
         myTransform.position = new Vector3(destinationX, myTransform.position.y, myTransform.position.z);
+    }
+
+    public void ForceCameraMove(int dir)
+    {
+        if (isCameraMoving)
+        {
+            PreFinishCameraMove();
+        }
+        CameraMove(dir);
+    }
+
+    public void ForceChangeSong(int dir)
+    {
+
+        if (currentSongIndex + dir < 0 || currentSongIndex + dir >= songs.Count)
+        {
+            //here we try to move somewhere we dont know...
+            return;
+        }
+        currentSongIndex += dir;
+        ViewSongData();
+        ForceCameraMove(dir);
+    }
+
+    void ViewSongData()
+    {
+        SongNameText.text = songs[currentSongIndex].songName;
+        SongAuthorText.text = songs[currentSongIndex].authorName;
+        //later we need to load record from here and to here
+        //we also need to play song in this place (may be)
     }
 
 }
