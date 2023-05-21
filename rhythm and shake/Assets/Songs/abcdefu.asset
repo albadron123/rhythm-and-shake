@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songName: abcdefu
   authorName: Gayle
-  songRecord: 0
+  songRecord: 162
+  lastTryScore: 162
   songPicture: {fileID: 0}
   track1: []
   track2: []
   trackAcc: []
+  audio: {fileID: 8300000, guid: be2577bc347d8924cb5871cfbb7e3c80, type: 3}

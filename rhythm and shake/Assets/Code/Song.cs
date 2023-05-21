@@ -7,9 +7,11 @@ public class Song : ScriptableObject
 {
     public string songName;
     public string authorName;
-    public string songRecord;
+    public int songRecord;
+    public int lastTryScore;
     public Sprite songPicture;
     public List<float> track1 = new List<float>();
     public List<float> track2 = new List<float>();
     public List<AccItem> trackAcc = new List<AccItem>();
+    public AudioClip audio;
 }

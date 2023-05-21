@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songName: Connect to friends via LAN
   authorName: 
-  songRecord: 
+  songRecord: 0
+  lastTryScore: 0
   songPicture: {fileID: 0}
   track1: []
   track2: []
   trackAcc: []
+  audio: {fileID: 8300000, guid: 1d6a3a672afc8004e836494cff781a95, type: 3}

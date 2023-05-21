@@ -10,7 +10,7 @@ public class PlayerButton : MonoBehaviour
     ButtonType buttonType;
 
     [SerializeField]
-    GyroChecker globalScript;
+    LevelSelection levelSelection;
 
     SpriteRenderer sr;
 
@@ -28,11 +28,15 @@ public class PlayerButton : MonoBehaviour
     {
         if (buttonType == ButtonType.leftShift)
         {
-            globalScript.ForceChangeSong(-1);
+            levelSelection.ForceChangeSong(-1);
         }
         if (buttonType == ButtonType.rightShift)
         {
-            globalScript.ForceChangeSong(1);
+            levelSelection.ForceChangeSong(1);
+        }
+        if (buttonType == ButtonType.play)
+        {
+            levelSelection.PlaySong();
         }
         sr.color = new Color(1, 1, 1, 0.2f);
     }

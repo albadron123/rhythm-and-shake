@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class Note : MonoBehaviour
 {
@@ -79,9 +80,9 @@ public class Note : MonoBehaviour
             {
                 myTabScript.notesInJudgementZone.Remove(gameObject);
                 inJundgementZone = false;
-                GyroChecker gc = GameObject.Find("Main Camera").GetComponent<GyroChecker>();
-                gc.PrintNote("Too late!", t.position);
-                gc.combo = 0;
+                GamePlayCode gameplay = GameObject.Find("Main Camera").GetComponent<GamePlayCode>();
+                gameplay.PrintNote("Too late!", t.position);
+                gameplay.combo = 0;
             }
         }
     }

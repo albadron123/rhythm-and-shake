@@ -55,11 +55,15 @@ public class SongGenerator : MonoBehaviour
 
     bool inGame = false;
 
-    GyroChecker gc;
+    GamePlayCode gameplay;
+
+    [SerializeField]
+    bool inMultiplayer = false;
 
     void Start()
     {
-        gc = GetComponent<GyroChecker>();
+        gameplay = GetComponent<GamePlayCode>();
+        if(!inMultiplayer) StartSong();
     }
 
     void FixedUpdate()
@@ -76,7 +80,7 @@ public class SongGenerator : MonoBehaviour
 
             if (track1Playing && timer >= track1Time)
             {
-                GenerateNote(new Vector3(-3f, 0.5f, -1.1f), track1Color);
+                GenerateNote(new Vector3(-3f, 1.5f, -1.1f), track1Color);
                 ++track1Index;
                 if (track1Index >= track1.Count)
                 {
@@ -89,7 +93,7 @@ public class SongGenerator : MonoBehaviour
             }
             if (track2Playing && timer >= track2Time)
             {
-                GenerateNote(new Vector3(-3f, -3f, -1.1f), track2Color);
+                GenerateNote(new Vector3(-3f, -2f, -1.1f), track2Color);
                 ++track2Index;
                 if (track2Index >= track2.Count)
                 {
@@ -102,7 +106,7 @@ public class SongGenerator : MonoBehaviour
             }
             if (trackAccPlaying && timer >= trackAccTime)
             {
-                GenerateArrow(new Vector3(-3f, 3.25f, -1.1f), trackAcc[trackAccIndex].dir);
+                GenerateArrow(new Vector3(-3f, 4f, -1.1f), trackAcc[trackAccIndex].dir);
                 ++trackAccIndex;
                 if (trackAccIndex >= trackAcc.Count)
                 {
@@ -134,7 +138,8 @@ public class SongGenerator : MonoBehaviour
 
     void OpenMenu()
     {
-        gc.EnterMenu();
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        gameplay.ExitGamePlay();
     }
 
     public void StartSong() 

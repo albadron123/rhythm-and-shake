@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   songName: Realligator
   authorName: MagnusTheMagnus
-  songRecord: 0
+  songRecord: 15
+  lastTryScore: 5
   songPicture: {fileID: 0}
   track1: []
   track2: []
   trackAcc: []
+  audio: {fileID: 8300000, guid: 6c45027708fe1c64f97ca996e77d5b39, type: 3}
