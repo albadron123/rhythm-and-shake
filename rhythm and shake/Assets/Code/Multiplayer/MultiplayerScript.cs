@@ -25,6 +25,9 @@ public class MultiplayerScript : MonoBehaviour
     [SerializeField]
     UnityTransport uTransport;
 
+    [SerializeField] GameObject hostIdentifier;
+    [SerializeField] GameObject clientIdentifier;
+
     void Start()
     {
     }
@@ -39,13 +42,16 @@ public class MultiplayerScript : MonoBehaviour
         NetworkManager.Singleton.StartHost();
         //it shows where are we hosting right now ;)
         GetLocalIPAddress();
+        hostIdentifier.SetActive(true);
     }
 
     public void StartClient()
     {
         ipAddress = ipAddressInputField.text;
         SetIpAddress();
-        NetworkManager.Singleton.StartClient();
+        bool res = NetworkManager.Singleton.StartClient();
+        ipAddressText.text = ipAddress + " (" + res + ")";
+        clientIdentifier.SetActive(true);
     }
 
     //HOST ONLY

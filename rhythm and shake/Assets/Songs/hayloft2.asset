@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39a6877494c6b31499051d179b7e5c36, type: 3}
+  m_Name: hayloft2
+  m_EditorClassIdentifier: 
+  songName: Hayloft II
+  authorName: Mother Mother
+  songRecord: 0
+  lastTryScore: 0
+  songPicture: {fileID: 21300000, guid: 63fddf6f007d0464897f4f3fdde3f0cb, type: 3}
+  track1: []
+  track2: []
+  trackAcc: []
+  audio: {fileID: 8300000, guid: 814950e428ccb9e439aac7541fdab3fe, type: 3}

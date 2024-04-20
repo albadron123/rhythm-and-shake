@@ -17,7 +17,115 @@ MonoBehaviour:
   songRecord: 15
   lastTryScore: 5
   songPicture: {fileID: 0}
-  track1: []
-  track2: []
-  trackAcc: []
+  track1:
+  - time: 9.75
+    dir: 0
+  - time: 11
+    dir: 0
+  - time: 11.25
+    dir: 0
+  - time: 11.5
+    dir: 1
+  - time: 12
+    dir: 0
+  - time: 13.25
+    dir: 0
+  - time: 13.5
+    dir: 0
+  - time: 13.75
+    dir: 1
+  - time: 15
+    dir: 0
+  - time: 16.25
+    dir: 2
+  - time: 17
+    dir: 0
+  - time: 17.5
+    dir: 0
+  - time: 18
+    dir: 0
+  - time: 18.5
+    dir: 0
+  - time: 19.75
+    dir: 0
+  - time: 20.25
+    dir: 0
+  - time: 21.25
+    dir: 0
+  - time: 21.5
+    dir: 0
+  - time: 23
+    dir: 0
+  - time: 35.25
+    dir: 0
+  - time: 36
+    dir: 4
+  - time: 36.5
+    dir: 4
+  - time: 37
+    dir: 4
+  - time: 37.5
+    dir: 4
+  - time: 40
+    dir: 0
+  track2:
+  - time: 10.25
+    dir: 0
+  - time: 11.5
+    dir: 1
+  - time: 12.5
+    dir: 0
+  - time: 14.5
+    dir: 0
+  - time: 15.5
+    dir: 0
+  - time: 16
+    dir: 0
+  - time: 16.25
+    dir: 2
+  - time: 16.75
+    dir: 0
+  - time: 17.25
+    dir: 0
+  - time: 17.75
+    dir: 0
+  - time: 18.25
+    dir: 0
+  - time: 19.75
+    dir: 0
+  - time: 20.75
+    dir: 0
+  - time: 36.25
+    dir: 3
+  - time: 36.75
+    dir: 3
+  - time: 37.25
+    dir: 3
+  - time: 37.75
+    dir: 3
+  - time: 40
+    dir: 0
+  trackAcc:
+  - time: 19.25
+    dir: 4
+  - time: 21
+    dir: 3
+  - time: 22.25
+    dir: 3
+  - time: 23.5
+    dir: 4
+  - time: 24
+    dir: 3
+  - time: 25.25
+    dir: 4
+  - time: 25.5
+    dir: 3
+  - time: 35.5
+    dir: 4
+  - time: 38.5
+    dir: 4
+  - time: 39
+    dir: 3
+  - time: 39.5
+    dir: 2
   audio: {fileID: 8300000, guid: 6c45027708fe1c64f97ca996e77d5b39, type: 3}

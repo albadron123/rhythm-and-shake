@@ -17,7 +17,29 @@ MonoBehaviour:
   songRecord: 162
   lastTryScore: 162
   songPicture: {fileID: 0}
-  track1: []
-  track2: []
-  trackAcc: []
+  track1:
+  - time: 0.3
+    dir: 0
+  - time: 0.8
+    dir: 1
+  - time: 1.5
+    dir: 2
+  - time: 2
+    dir: 3
+  - time: 2.5
+    dir: 4
+  track2:
+  - time: 4
+    dir: 1
+  - time: 5
+    dir: 2
+  - time: 6
+    dir: 3
+  - time: 7
+    dir: 0
+  - time: 8
+    dir: 3
+  trackAcc:
+  - time: 10
+    dir: 4
   audio: {fileID: 8300000, guid: be2577bc347d8924cb5871cfbb7e3c80, type: 3}

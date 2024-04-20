@@ -1,77 +1,65 @@
 {
     "m_SelectedDeviceId": "R5CT80JSVGY",
-    "m_SelectedPackage": {
-        "deviceId": "",
-        "name": "",
-        "processId": 0,
+    "m_SelectedProcess": {
+        "deviceId": "R5CT80JSVGY",
+        "name": "com.Kladovka.RhythmAndShake",
+        "processId": 31856,
         "exited": false
     },
     "m_SelectedPriority": 0,
-    "m_KnownPackagesForSerialization": [
+    "m_KnownProcessesForSerialization": [
+        {
+            "deviceId": "VO9985D6RO8HCQ7X",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 17921,
+            "exited": false
+        },
+        {
+            "deviceId": "VO9985D6RO8HCQ7X",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 19232,
+            "exited": false
+        },
+        {
+            "deviceId": "VO9985D6RO8HCQ7X",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 20822,
+            "exited": false
+        },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.sec.android.app.launcher",
-            "processId": 2763,
+            "processId": 2860,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 31793,
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 29510,
             "exited": true
         },
         {
             "deviceId": "R5CT80JSVGY",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 1394,
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 29982,
             "exited": true
         },
         {
             "deviceId": "R5CT80JSVGY",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 3419,
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 30886,
             "exited": true
         },
         {
             "deviceId": "R5CT80JSVGY",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 4380,
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 31425,
             "exited": true
         },
         {
-            "deviceId": "QWPZLRZ97DM76DJZ",
-            "name": "com.miui.home",
-            "processId": 1734,
-            "exited": false
-        },
-        {
-            "deviceId": "QWPZLRZ97DM76DJZ",
-            "name": "com.android.settings",
-            "processId": 21789,
-            "exited": false
-        },
-        {
-            "deviceId": "QWPZLRZ97DM76DJZ",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 27784,
-            "exited": false
-        },
-        {
-            "deviceId": "QWPZLRZ97DM76DJZ",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 29231,
-            "exited": false
-        },
-        {
-            "deviceId": "QWPZLRZ97DM76DJZ",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 30125,
-            "exited": false
-        },
-        {
-            "deviceId": "QWPZLRZ97DM76DJZ",
-            "name": "com.DefaultCompany.com.unity.template.mobile2D",
-            "processId": 31171,
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 31856,
             "exited": false
         }
     ],
@@ -107,8 +95,11 @@
             }
         ]
     },
+    "m_ExtraWindowState": {
+        "Type": 0,
+        "Height": 0.0
+    },
     "m_MemoryViewerState": {
-        "MemoryWindowHeight": 300.0,
         "MemoryWindowWidth": 170.0,
         "MemoryTypeEnabled": [
             true,
@@ -123,7 +114,7 @@
             true
         ],
         "MemoryGroup": 2,
-        "Behavior": 0
+        "AutoCapture": true
     },
     "m_FilterOptions": {
         "m_Filter": "",
@@ -141,5 +132,17 @@
         "BitRateK": 20000,
         "DisplayIdEnabled": false,
         "DisplayId": ""
-    }
+    },
+    "m_InputSettings": {
+        "ShiftModifier": false,
+        "SendText": "",
+        "PosixKillSignal": 0,
+        "TargetProcess": {
+            "deviceId": "",
+            "name": "",
+            "processId": 0,
+            "exited": false
+        }
+    },
+    "m_AutoScroll": 0
 }

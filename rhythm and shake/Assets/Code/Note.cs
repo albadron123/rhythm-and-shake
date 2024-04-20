@@ -5,6 +5,7 @@ using System.Linq;
 
 public class Note : MonoBehaviour
 {
+    public NoteType type;
 
     [SerializeField]
     GameObject plarticle;
@@ -20,6 +21,8 @@ public class Note : MonoBehaviour
     SpriteRenderer sr;
 
     public ArrowDirection dir;
+
+    public bool hasDir = false;
 
     void Start()
     {
@@ -81,8 +84,9 @@ public class Note : MonoBehaviour
                 myTabScript.notesInJudgementZone.Remove(gameObject);
                 inJundgementZone = false;
                 GamePlayCode gameplay = GameObject.Find("Main Camera").GetComponent<GamePlayCode>();
-                gameplay.PrintNote("Too late!", t.position);
+                gameplay.PrintNote("Too late!", t.position, sr.color);
                 gameplay.combo = 0;
+                gameplay.ChangeMaxScoreNow(type);
             }
         }
     }

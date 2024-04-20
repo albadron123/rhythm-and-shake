@@ -8,16 +8,39 @@ using System.Net.Sockets;
 
 public class NetworkVar : NetworkBehaviour
 {
+    /// <summary>
+    /// TODO: 
+    /// 1. обновиться и избежать вылетаний 
+    /// 2. добавление 2х игроков и отображения их очков на компьютере
+    /// 3. информация о нажатии панелей и убийстве точек у каждого из игроков
+    /// 4. имя при подключении
+    /// 5. как то разобраться с host, автоматизировать поиск адреса устройства
+    /// 6. обработка вылетания клиента
+    /// </summary>
+
+
+
+
+    [SerializeField]
+    TMPro.TMP_Text scoreText;
+
+    [SerializeField]
+    bool isHost = false;
+
+
     public NetworkVariable<bool> State = new NetworkVariable<bool>();
+    public NetworkVariable<int> Score = new NetworkVariable<int>();
 
     public override void OnNetworkSpawn()
     {
         State.OnValueChanged += OnStateChanged;
+        Score.OnValueChanged += OnScoreChanged;
     }
 
     public override void OnNetworkDespawn()
     {
         State.OnValueChanged -= OnStateChanged;
+        Score.OnValueChanged -= OnScoreChanged;
     }
 
     public void OnStateChanged(bool previous, bool current)
@@ -25,7 +48,9 @@ public class NetworkVar : NetworkBehaviour
         // note: `State.Value` will be equal to `current` here
         if (State.Value)
         {
-            GameObject.Find("Main Camera").GetComponent<SongGenerator>().StartSong();
+            
+            if(!isHost) 
+                GameObject.Find("Main Camera").GetComponent<SongGenerator>().newStartSong();
             // door is open:
             //  - rotate door transform
             //  - play animations, sound etc.
@@ -38,6 +63,12 @@ public class NetworkVar : NetworkBehaviour
         }
     }
 
+    public void OnScoreChanged(int previous, int current)
+    {
+        scoreText.text = Score.Value.ToString();
+    }
+
+
     [ServerRpc(RequireOwnership = false)]
     public void ToggleServerRpc()
     {
@@ -45,4 +76,12 @@ public class NetworkVar : NetworkBehaviour
         // and ultimately invoke `OnValueChanged` on receivers
         State.Value = !State.Value;
     }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ChangeScoreServerRpc(int delta)
+    {
+        Score.Value = Score.Value + delta;
+    }
+
+
 }

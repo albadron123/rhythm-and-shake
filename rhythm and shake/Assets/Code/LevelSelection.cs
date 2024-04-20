@@ -18,6 +18,11 @@ public class LevelSelection : MonoBehaviour
     [SerializeField]
     List<Song> songs = new List<Song>();
     int currentSongIndex = 1;
+    public static bool currentSongInMultiplayer = false;
+
+
+    [SerializeField]
+    MenuSlider mSlider;
 
 
     [SerializeField]
@@ -44,16 +49,22 @@ public class LevelSelection : MonoBehaviour
     [SerializeField]
     GameObject canvas;
 
-    [SerializeField]
-    Transform tab1Transform;
 
-    TabScript tabScript1;
+    [SerializeField]
+    List<TabScript> tabScripts = new List<TabScript>();
+
+    [SerializeField]
+    GameObject tabPrefab;
+
 
 
     [SerializeField]
     GameObject playSongButton;
 
     AudioSource audioSource;
+
+    bool inSelectionMenu = false;
+
 
 
     enum HState { straight, left, right };
@@ -82,7 +93,7 @@ public class LevelSelection : MonoBehaviour
     {
         myTransform = transform;
 
-        tabScript1 = tab1Transform.GetComponent<TabScript>();
+        //tabScript1 = tab1Transform.GetComponent<TabScript>();
         audioSource = GetComponent<AudioSource>();
 
         if (!Input.gyro.enabled)
@@ -95,106 +106,140 @@ public class LevelSelection : MonoBehaviour
 
         Vibration.Init();
 
+        AddCustomSongs();
+
         //Later should expand it
         EnterMenu();
         //ViewSongData();
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        Vector3 acc = Input.acceleration;
+        if(inSelectionMenu)
+        { 
+            Vector3 acc = Input.acceleration;
 
-        HState prevHState = hState;
-        VState prevVstate = vState;
+            HState prevHState = hState;
+            VState prevVstate = vState;
 
-        if (acc.x < inStraightAccuracy && hState == HState.right)
-        {
-            hState = HState.straight;
-        }
-        else if (acc.x > -inStraightAccuracy && hState == HState.left)
-        {
-            hState = HState.straight;
-        }
-        else if (acc.x > inSideAccuracy && hState == HState.straight)
-        {
-            hState = HState.right;
-        }
-        else if (acc.x < -inSideAccuracy && hState == HState.straight)
-        {
-            hState = HState.left;
-        }
-
-        if (acc.y < inStraightAccuracy && vState == VState.up)
-        {
-            vState = VState.straight;
-        }
-        else if (acc.y > -inStraightAccuracy && vState == VState.down)
-        {
-            vState = VState.straight;
-        }
-        else if (acc.y > inSideAccuracy && vState == VState.straight)
-        {
-            vState = VState.up;
-        }
-        else if (acc.y < -inSideAccuracy && vState == VState.straight)
-        {
-            vState = VState.down;
-        }
-
-
-        if (isCameraMoving)
-        {
-            myTransform.position += Vector3.right * (destinationX - myTransform.position.x) * cameraVelocty * Time.deltaTime;
-            if (Mathf.Abs(myTransform.position.x - destinationX) < 0.05f)
+            if (acc.x < inStraightAccuracy && hState == HState.right)
             {
-                myTransform.position = new Vector3(destinationX, myTransform.position.y, myTransform.position.z);
-                isCameraMoving = false;
+                hState = HState.straight;
             }
-        }
-
-        tab1Transform.rotation = Quaternion.Euler(-acc.y * 25f, -acc.x * 25f, 0);
-
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            PlaySong();
-            //songGenerator.StartSong();
-        }
-
-        if (Input.touchCount > 0)
-        {
-            Touch[] touches = Input.touches;
-            foreach (Touch t in touches)
+            else if (acc.x > -inStraightAccuracy && hState == HState.left)
             {
-                if (t.phase == TouchPhase.Began)
+                hState = HState.straight;
+            }
+            else if (acc.x > inSideAccuracy && hState == HState.straight)
+            {
+                hState = HState.right;
+            }
+            else if (acc.x < -inSideAccuracy && hState == HState.straight)
+            {
+                hState = HState.left;
+            }
+
+            if (acc.y < inStraightAccuracy && vState == VState.up)
+            {
+                vState = VState.straight;
+            }
+            else if (acc.y > -inStraightAccuracy && vState == VState.down)
+            {
+                vState = VState.straight;
+            }
+            else if (acc.y > inSideAccuracy && vState == VState.straight)
+            {
+                vState = VState.up;
+            }
+            else if (acc.y < -inSideAccuracy && vState == VState.straight)
+            {
+                vState = VState.down;
+            }
+
+
+            if (isCameraMoving)
+            {
+                myTransform.position += Vector3.right * (destinationX - myTransform.position.x) * cameraVelocty * Time.deltaTime;
+                if (Mathf.Abs(myTransform.position.x - destinationX) < 0.05f)
                 {
-                    Vector2 pos = -Camera.main.ScreenToWorldPoint(new Vector3(t.position.x, t.position.y, -9));
-                    Vector3 tab1Scale = tab1Transform.localScale;
-                    if (pos.x < (tab1Transform.position.x + (tab1Scale.x / 2f)) && pos.x > (tab1Transform.position.x - (tab1Scale.x / 2f)) &&
-                        pos.y < (tab1Transform.position.y + (tab1Scale.y / 2f)) && pos.y > (tab1Transform.position.y - (tab1Scale.y / 2f)))
+                    myTransform.position = new Vector3(destinationX, myTransform.position.y, myTransform.position.z);
+                    isCameraMoving = false;
+                }
+            }
+
+            //tab1Transform.rotation = Quaternion.Euler(-acc.y * 25f, -acc.x * 25f, 0);
+
+            if (Input.GetKeyDown(KeyCode.Z))
+            {
+                PlaySong();
+                //songGenerator.StartSong();
+            }
+
+            if (Input.touchCount > 0)
+            {
+                Touch[] touches = Input.touches;
+                foreach (Touch t in touches)
+                {
+                    if (t.phase == TouchPhase.Began)
                     {
-                        tabScript1.TapIncrease(true);
-                        //here we will turn song tab around
+                        Vector2 pos = Camera.main.ScreenToWorldPoint(new Vector3(t.position.x, t.position.y, -9));
+                        if (MyUtitities.TouchOver(pos, tabScripts[currentSongIndex].transform))
+                        {
+                            tabScripts[currentSongIndex].TapIncrease(true, Color.green);
+                            tabScripts[currentSongIndex].TabRotate(currentSongInMultiplayer == true ? -1 : 1);
+                            currentSongInMultiplayer = !currentSongInMultiplayer;
+                            //here we will turn song tab around (Horray, one year passed and we are finally here!)
+                            //let's do multiplayer now!
+                            //but firstly  _____                
+                            //     _..--'''@   @'''--.._
+                            //   .'   @_/-//-\/>/>'/ @  '.
+                            //  (  @  /_<//<'/----------^-)
+                            //  |'._  @     //|###########|
+                            //  |~  ''--..@|',|}}}}}}}}}}}|
+                            //  |  ~   ~   |/ |###########|
+                            //  | ~~  ~   ~|./|{{{{{{{{{{{|
+                            //   '._ ~ ~ ~ |,/`````````````
+                            //      ''--.~.|/
+                            // a cake!!!!!!!!!!!!!!!!
+                        }
                     }
                 }
             }
-        }
 
-
-        if (prevHState == HState.straight && hState == HState.left)
-        {
-            if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f))
+            if (Input.GetKeyDown(KeyCode.R))
             {
-                ForceChangeSong(-1);
+                Debug.Log("rotating!");
+                tabScripts[currentSongIndex].TabRotate(currentSongInMultiplayer == true ? -1 : 1);
+                currentSongInMultiplayer = !currentSongInMultiplayer;
+            }
+
+
+            if (prevHState == HState.straight && hState == HState.left)
+            {
+                if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f))
+                {
+                    ForceChangeSong(-1);
+                }
+            }
+
+            if (prevHState == HState.straight && hState == HState.right)
+            {
+                if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f))
+                {
+                    ForceChangeSong(1);
+                }
             }
         }
+    }
 
-        if (prevHState == HState.straight && hState == HState.right)
+    public void RotateCurrentTabBack()
+    {
+        if (currentSongInMultiplayer == true)
         {
-            if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f))
-            {
-                ForceChangeSong(1);
-            }
+            tabScripts[currentSongIndex].TabRotate(-1);
+            currentSongInMultiplayer = false;
         }
     }
 
@@ -209,7 +254,44 @@ public class LevelSelection : MonoBehaviour
     {
         transportedData.currentMenuIndex = currentSongIndex;
         transportedData.currentSong = songs[currentSongIndex];
-        SceneManager.LoadScene("GameplayScene");
+        //purely temporal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (currentSongIndex == 3)
+        {
+            SceneManager.LoadScene("TrackGenerator");
+        }
+        else
+        {
+            SceneManager.LoadScene("GameplayScene");
+        }
+    }
+
+    [SerializeField] GameObject cassetePlayer;
+    [SerializeField] GameObject lvlSelectionCanvas;
+    public void PrepareMenu()
+    {
+        GameObject[] tabs = GameObject.FindGameObjectsWithTag("tab");
+        for (int i = 0; i < tabs.Length; ++i)
+        {
+            tabs[i].GetComponent<SpriteRenderer>().enabled = true;
+            //if there will be errors then they will be HERE!
+            tabs[i].SetActiveRecursively(true);
+        }
+        cassetePlayer.SetActive(true);
+        lvlSelectionCanvas.SetActive(true);
+        inSelectionMenu = true;
+    }
+    public void PrepareMenuExit()
+    {
+        GameObject[] tabs = GameObject.FindGameObjectsWithTag("tab");
+        for (int i = 0; i < tabs.Length; ++i)
+        {
+            tabs[i].GetComponent<SpriteRenderer>().enabled = false;
+            //if there will be errors then they will be HERE!
+            //tabs[i].SetActiveRecursively(true);
+        }
+        cassetePlayer.SetActive(false);
+        lvlSelectionCanvas.SetActive(false);
+        inSelectionMenu = false;
     }
 
     public void EnterMenu()
@@ -220,10 +302,7 @@ public class LevelSelection : MonoBehaviour
         myTransform.position = new Vector3(cameraShift * (currentSongIndex - 1), myTransform.position.y, myTransform.position.z);
         SongAuthorText.text = transportedData.currentSong.authorName;
         SongNameText.text = transportedData.currentSong.songName;
-        if (transportedData.currentSong.lastTryScore > transportedData.currentSong.songRecord)
-        {
-            transportedData.currentSong.songRecord = transportedData.currentSong.lastTryScore;
-        }
+        
         ViewSongData();
         //later we will move it to view song data
         /*
@@ -280,12 +359,66 @@ public class LevelSelection : MonoBehaviour
     {
         SongNameText.text = songs[currentSongIndex].songName;
         SongAuthorText.text = songs[currentSongIndex].authorName;
-        LastTryText.text = "Last try: " + songs[currentSongIndex].lastTryScore.ToString();
+        //LastTryText.text = "Last try: " + songs[currentSongIndex].lastTryScore.ToString();
+        //transportedData.currentSong
+        if (PlayerPrefs.HasKey(MyUtitities.scoreSaveFlag + songs[currentSongIndex].songName))
+        {
+            songs[currentSongIndex].songRecord = PlayerPrefs.GetInt(MyUtitities.scoreSaveFlag + songs[currentSongIndex].songName);
+        }
+        else
+        {
+            songs[currentSongIndex].songRecord = 0;
+            PlayerPrefs.SetInt(MyUtitities.scoreSaveFlag + songs[currentSongIndex].songName, 0);
+        }
+        //REDO THIS LATER
+        if (PlayerPrefs.HasKey(MyUtitities.scoreSaveFlag + "lastTry__" + songs[currentSongIndex].songName))
+        {
+            songs[currentSongIndex].lastTryScore = PlayerPrefs.GetInt(MyUtitities.scoreSaveFlag + "lastTry__" + songs[currentSongIndex].songName);
+        }
+        else
+        {
+            songs[currentSongIndex].lastTryScore = 0;
+            PlayerPrefs.SetInt(MyUtitities.scoreSaveFlag + "lastTry__" + songs[currentSongIndex].songName, 0);
+        }
+        if (songs[currentSongIndex].songRecord == 0)
+        {
+            mSlider.Reset(0, 0, 100);
+        }
+        else
+        {
+            int maxScore = 100;
+            if(PlayerPrefs.HasKey(MyUtitities.scoreSaveFlag + "max__" + songs[currentSongIndex].songName))
+                maxScore = PlayerPrefs.GetInt(MyUtitities.scoreSaveFlag + "max__" + songs[currentSongIndex].songName);
+            mSlider.Reset(songs[currentSongIndex].lastTryScore, songs[currentSongIndex].songRecord, maxScore);
+        }
         RecordText.text = "Record: " + songs[currentSongIndex].songRecord.ToString();
         audioSource.clip = songs[currentSongIndex].audio;
         audioSource.Play();
         //later we need to load record from here and to here
-        //we also need to play song in this place (may be)
+    }
+
+    void AddCustomSongs()
+    {
+        foreach (AudioInfo audioI in transportedData.deletctedAudioFiles)
+        {
+            string audioName = audioI.name.Replace(".wav", "");
+            if (transportedData.detectedJsonFiles.Exists(x => (x.name).Replace(".json", "") == audioName))
+            {
+                Song s = new Song();
+                MyUtitities.LoadSongFromJSON(ref s, transportedData.detectedJsonFiles.Find(x => (x.name).Replace(".json", "") == audioName).json);
+                s.audio = audioI.clip;
+                songs.Add(s);
+                //later may be add custom album covers
+                GameObject tabInstance = Instantiate(tabPrefab, new Vector3((songs.Count - 2) * 3.7f, 1.9f, -1), Quaternion.identity);
+                tabScripts.Add(tabInstance.GetComponent<TabScript>());
+            }
+        }
+    }
+
+
+    public string GetCurrentSongWAVAddress()
+    {
+        return Application.persistentDataPath + "/songs/" + songs[currentSongIndex].songName+".wav";
     }
 
 }

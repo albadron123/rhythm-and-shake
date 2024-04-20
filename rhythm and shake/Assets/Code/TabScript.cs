@@ -8,9 +8,6 @@ public class TabScript : MonoBehaviour
 {
     public List<GameObject> notesInJudgementZone = new List<GameObject>();
 
-    [SerializeField]
-    Color tabCol;
-
     SpriteRenderer sr;
 
     Transform t;
@@ -18,6 +15,9 @@ public class TabScript : MonoBehaviour
 
     bool increasing = false;
     bool decreacing = false;
+
+    bool rotating = false;
+    int rotDir = 0;
 
     [SerializeField]
     float maxSize;
@@ -57,17 +57,42 @@ public class TabScript : MonoBehaviour
                 t.localScale = new Vector3(minSize, minSize, 1);
             }
         }
+        if (rotating)
+        {
+            float delta = Time.deltaTime * 1000 * rotDir;
+            if (rotDir > 0 && Mathf.Abs(t.rotation.eulerAngles.y - 180) < Mathf.Abs(delta))
+            {
+                rotating = false;
+                t.rotation = Quaternion.Euler(0, 179.99f, 0);
+            }
+            else if (rotDir < 0 && Mathf.Abs(t.rotation.eulerAngles.y - 0) < Mathf.Abs(delta))
+            {
+                rotating = false;
+                t.rotation = Quaternion.identity;
+            }
+            else
+            {
+                t.rotation = Quaternion.Euler(0, t.rotation.eulerAngles.y + delta, 0);
+            }
+
+        }
 
     }
 
-    public void TapIncrease(bool success)
+    public void TapIncrease(bool success, Color c)
     {
         if (success)
         {
-            sr.color = tabCol;
+            sr.color = c;
         }
         t.localScale = new Vector3(minSize, minSize, 1);
         increasing = true; 
+    }
+
+    public void TabRotate(int dir)
+    {
+        rotDir = dir;
+        rotating = true;
     }
 
 
