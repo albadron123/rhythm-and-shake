@@ -17,7 +17,7 @@ public class LevelSelection : MonoBehaviour
 
     [SerializeField]
     List<Song> songs = new List<Song>();
-    int currentSongIndex = 1;
+    int currentSongIndex = 0;
     public static bool currentSongInMultiplayer = false;
 
 
@@ -35,6 +35,14 @@ public class LevelSelection : MonoBehaviour
     TMPro.TMP_Text RecordText;
 
 
+    const int REWARDS_COUNT = 4;
+    [SerializeField]
+    GameObject[] rewardPoints = new GameObject[REWARDS_COUNT];
+    [SerializeField]
+    int[] rewards = new int[REWARDS_COUNT];
+    float[] rewardsPercents = {0.5f, 0.75f, 0.9f, 1f};
+
+
 
     [SerializeField]
     GameObject textPrefab;
@@ -48,6 +56,9 @@ public class LevelSelection : MonoBehaviour
 
     [SerializeField]
     GameObject canvas;
+
+    [SerializeField]
+    GameObject divisionLine;
 
 
     [SerializeField]
@@ -93,7 +104,6 @@ public class LevelSelection : MonoBehaviour
     {
         myTransform = transform;
 
-        //tabScript1 = tab1Transform.GetComponent<TabScript>();
         audioSource = GetComponent<AudioSource>();
 
         if (!Input.gyro.enabled)
@@ -111,6 +121,8 @@ public class LevelSelection : MonoBehaviour
         //Later should expand it
         EnterMenu();
         //ViewSongData();
+
+        PrepareMenuExit();
 
     }
 
@@ -254,15 +266,7 @@ public class LevelSelection : MonoBehaviour
     {
         transportedData.currentMenuIndex = currentSongIndex;
         transportedData.currentSong = songs[currentSongIndex];
-        //purely temporal!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if (currentSongIndex == 3)
-        {
-            SceneManager.LoadScene("TrackGenerator");
-        }
-        else
-        {
-            SceneManager.LoadScene("GameplayScene");
-        }
+        SceneManager.LoadScene("GameplayScene");
     }
 
     [SerializeField] GameObject cassetePlayer;
@@ -273,11 +277,15 @@ public class LevelSelection : MonoBehaviour
         for (int i = 0; i < tabs.Length; ++i)
         {
             tabs[i].GetComponent<SpriteRenderer>().enabled = true;
-            //if there will be errors then they will be HERE!
-            tabs[i].SetActiveRecursively(true);
+            //we enable all the children
+            for (int childID = 0; childID < tabs[i].transform.childCount; ++childID)
+            {
+                tabs[i].transform.GetChild(childID).gameObject.SetActive(true);
+            }
         }
         cassetePlayer.SetActive(true);
         lvlSelectionCanvas.SetActive(true);
+        divisionLine.SetActive(true);
         inSelectionMenu = true;
     }
     public void PrepareMenuExit()
@@ -287,19 +295,26 @@ public class LevelSelection : MonoBehaviour
         {
             tabs[i].GetComponent<SpriteRenderer>().enabled = false;
             //if there will be errors then they will be HERE!
-            //tabs[i].SetActiveRecursively(true);
+            //tabs[i].SetActiveRecursively(false);
+            //we disable all the children
+            for (int childID = 0; childID < tabs[i].transform.childCount; ++childID)
+            {
+                tabs[i].transform.GetChild(childID).gameObject.SetActive(false);
+            }
         }
         cassetePlayer.SetActive(false);
         lvlSelectionCanvas.SetActive(false);
+        divisionLine.SetActive(false);
         inSelectionMenu = false;
     }
+
 
     public void EnterMenu()
     {
         sTransition.FadeIn();
         currentSongIndex = transportedData.currentMenuIndex;
         //set camera on needed position
-        myTransform.position = new Vector3(cameraShift * (currentSongIndex - 1), myTransform.position.y, myTransform.position.z);
+        myTransform.position = new Vector3(cameraShift * currentSongIndex, myTransform.position.y, myTransform.position.z);
         SongAuthorText.text = transportedData.currentSong.authorName;
         SongNameText.text = transportedData.currentSong.songName;
         
@@ -318,7 +333,6 @@ public class LevelSelection : MonoBehaviour
             RecordText.text = "Record: " + bestScore;
         */
     }
-
 
 
     void CameraMove(int dir)
@@ -391,6 +405,20 @@ public class LevelSelection : MonoBehaviour
                 maxScore = PlayerPrefs.GetInt(MyUtitities.scoreSaveFlag + "max__" + songs[currentSongIndex].songName);
             mSlider.Reset(songs[currentSongIndex].lastTryScore, songs[currentSongIndex].songRecord, maxScore);
         }
+
+        //working with grades in here
+        if (PlayerPrefs.HasKey(MyUtitities.lastRewardFlag + songs[currentSongIndex].songName))
+        {
+            int lastReward = PlayerPrefs.GetInt(MyUtitities.lastRewardFlag + songs[currentSongIndex].songName);
+            
+            for (int i = lastReward; i < REWARDS_COUNT; ++i)
+            {
+                rewardPoints[i].SetActive(true);
+            }
+
+
+        }
+
         RecordText.text = "Record: " + songs[currentSongIndex].songRecord.ToString();
         audioSource.clip = songs[currentSongIndex].audio;
         audioSource.Play();
@@ -409,7 +437,19 @@ public class LevelSelection : MonoBehaviour
                 s.audio = audioI.clip;
                 songs.Add(s);
                 //later may be add custom album covers
-                GameObject tabInstance = Instantiate(tabPrefab, new Vector3((songs.Count - 2) * 3.7f, 1.9f, -1), Quaternion.identity);
+                Sprite albumCover = MyUtitities.LoadNewSprite(Application.persistentDataPath + "/covers/" + audioName + ".jpg");
+                if(albumCover == null)
+                    albumCover = MyUtitities.LoadNewSprite(Application.persistentDataPath + "/covers/" + audioName + ".png");
+                if(albumCover == null)
+                    albumCover = MyUtitities.LoadNewSprite(Application.persistentDataPath + "/covers/" + audioName + ".jpeg");
+
+                GameObject tabInstance = Instantiate(tabPrefab, new Vector3((songs.Count - 1) * 3.7f, 1.9f, -1), Quaternion.identity);
+
+                if (albumCover != null)
+                {
+                    tabInstance.transform.Find("cover").GetComponent<SpriteRenderer>().sprite = albumCover;
+                }
+
                 tabScripts.Add(tabInstance.GetComponent<TabScript>());
             }
         }

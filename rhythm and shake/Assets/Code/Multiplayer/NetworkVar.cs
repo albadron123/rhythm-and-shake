@@ -50,7 +50,7 @@ public class NetworkVar : NetworkBehaviour
         {
             
             if(!isHost) 
-                GameObject.Find("Main Camera").GetComponent<SongGenerator>().newStartSong();
+                GameObject.Find("Main Camera").GetComponent<SongGenerator>().StartSong();
             // door is open:
             //  - rotate door transform
             //  - play animations, sound etc.

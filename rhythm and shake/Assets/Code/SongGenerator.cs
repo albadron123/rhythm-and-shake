@@ -18,6 +18,10 @@ public class NoteTimeAndType
 public class SongGenerator : MonoBehaviour
 {
     [SerializeField]
+    GameObject pauseMenu;
+
+
+    [SerializeField]
     GameObject classicNotePrefab;
     [SerializeField]
     GameObject leftNotePrefab;
@@ -48,27 +52,13 @@ public class SongGenerator : MonoBehaviour
     [SerializeField]
     float trackVelocity;
 
-    int track1Index = 0;
-    int track2Index = 0;
-    int trackAccIndex = 0;
-    float track1Time;
-    float track2Time;
-    float trackAccTime;
-    float timer;
-
-    bool track1Playing;
-    bool track2Playing;
-    bool trackAccPlaying;
-
     [SerializeField]
     AudioSource song;
 
     [SerializeField]
     float delay = 1f;
 
-    bool isPlaying = false;
-
-    bool inGame = false;
+    public static bool isPlaying = false;
 
     GamePlayCode gameplay;
 
@@ -83,26 +73,13 @@ public class SongGenerator : MonoBehaviour
 
     int maxScoreNow;
     int maxComboNow;
-    
+
+    double trackTime = 0;
+    double timer = 0;
+
 
     void Start()
     {
-        //TEMPORAL CODE! BE AFRAID!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        if (td.currentMenuIndex == 4)
-        {
-
-            if (System.IO.File.Exists(Application.persistentDataPath + "/Test.json"))
-                MyUtitities.LoadSongFromAndroid(ref td.currentSong, "Test.json");
-            else
-                SceneManager.LoadScene("SampleScene");
-        }
-        if (td.currentMenuIndex == 5)
-        {
-            if (System.IO.File.Exists(Application.persistentDataPath + "/heyloft.json"))
-                MyUtitities.LoadSongFromAndroid(ref td.currentSong, "heyloft.json");
-            else
-                SceneManager.LoadScene("SampleScene");
-        }
         gameplay = GetComponent<GamePlayCode>();
         if (!inMultiplayer)
         {
@@ -110,113 +87,77 @@ public class SongGenerator : MonoBehaviour
             track1 = td.currentSong.track1;
             track2 = td.currentSong.track2;
             trackAcc = td.currentSong.trackAcc;
-            newStartSong();
+            StartSong();
         }
     }
-
-    void FixedUpdate()
-    {
-        /*
-        if (inGame)
-        {
-            timer += Time.deltaTime;
-
-            if (timer >= delay && !isPlaying)
-            {
-                song.Play();
-                isPlaying = true;
-            }
-
-            if (track1Playing && timer >= track1Time)
-            {
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                GenerateNote(new Vector3(-3f, 0.2f, -1.1f), track1[track1Index].dir);
-                ++track1Index;
-                if (track1Index >= track1.Count)
-                {
-                    track1Playing = false;
-                }
-                else
-                {
-                    track1Time = track1[track1Index].time;
-                }
-            }
-            if (track2Playing && timer >= track2Time)
-            {
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                GenerateNote(new Vector3(-3f, -3.2f, -1.1f), track2[track2Index].dir);
-                ++track2Index;
-                if (track2Index >= track2.Count)
-                {
-                    track2Playing = false;
-                }
-                else
-                {
-                    track2Time = track2[track2Index].time;
-                }
-            }
-            if (trackAccPlaying && timer >= trackAccTime)
-            {
-                GenerateArrow(new Vector3(-3f, 2.7f, 0f), trackAcc[trackAccIndex].dir);
-                ++trackAccIndex;
-                if (trackAccIndex >= trackAcc.Count)
-                {
-                    trackAccPlaying = false;
-                }
-                else
-                {
-                    trackAccTime = trackAcc[trackAccIndex].time;
-                }
-            }
-
-
-            if (!track1Playing && !track2Playing && !trackAccPlaying)
-            {
-                inGame = false;
-                //later here we will finish tracks
-                Invoke("StopSongAndOpenMenu", delay + 0.5f);
-            }
-        }
-        */
-    }
-
 
     void StopSongAndOpenMenu()
     {
         isPlaying = false;
         song.Stop();
-        Invoke("OpenMenu", 1f);
-    }
-
-    void OpenMenu()
-    {
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         gameplay.ExitGamePlay();
     }
 
-    
 
-    public void newStartSong()
+    public void PauseSong()
     {
-        GenerateTrack();
-        Invoke("StartAudio", delay);
-        //LATER REFACTOR TRO ADD PAUSE
-        Invoke("StopSongAndOpenMenu", delay + Mathf.Max(track1[track1.Count - 1].time, track2[track2.Count - 1].time, trackAcc[trackAcc.Count - 1].time));
+        isPlaying = false;
+        song.Pause();
+        pauseMenu.SetActive(true);
     }
 
-    void StartAudio()
+    public void ResumeSong()
     {
+        isPlaying = true;
+        song.UnPause();
+        pauseMenu.SetActive(false);
+    }
+
+    public void ExitToMenu()
+    {
+        gameplay.ExitGamePlay();
+    }
+
+    public void RetrySong()
+    {
+        gameplay.SaveRecords();
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+    
+
+    public void StartSong()
+    {
+        GenerateTrack();
         song.Play();
+        timer = 0;
+        trackTime = 2*delay + Mathf.Max(track1[track1.Count - 1].time, track2[track2.Count - 1].time, trackAcc[trackAcc.Count - 1].time);
+        isPlaying = true;
+    }
+
+
+    private void Update()
+    {
+        if (isPlaying)
+        {
+            timer += Time.deltaTime;
+            if (timer >= trackTime)
+            {
+                StopSongAndOpenMenu();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            if (isPlaying)
+            {
+                PauseSong();
+            }
+            else
+            {
+                ResumeSong();
+            }
+        }
+        
     }
 
     void GenerateTrack()

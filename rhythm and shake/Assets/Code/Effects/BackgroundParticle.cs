@@ -22,6 +22,13 @@ public class BackgroundParticle : MonoBehaviour
     Vector3 direction;
     bool movingToDir = false;
 
+    bool scaling = false;
+    float initialScale;
+    int scaleDirection;
+    float scaleVelocity = 1.5f;
+    float maxScale;
+    float scale;
+
     void Start()
     {
         sr = GetComponent<SpriteRenderer>();
@@ -39,7 +46,13 @@ public class BackgroundParticle : MonoBehaviour
         rotationalDirection = Random.Range(0, 2) == 1 ? 1 : -1;
 
         movingToDir = false;
+        scaling = false;
         colorSeed = Random.Range(0, 0.1f);
+
+
+        scale = transform.localScale.x;
+        maxScale = scale * 1.2f;
+        initialScale = scale;
     }
 
     void Update()
@@ -80,6 +93,28 @@ public class BackgroundParticle : MonoBehaviour
             sr.color = Color.Lerp(initialColor, sr.color, colorPortion);
         }
 
+        if (scaling)
+        {
+            if (scaleDirection == 1)
+            {
+                scale += scaleVelocity * scaleVelocity * Time.deltaTime;
+                if (scale > maxScale)
+                {
+                    scaleDirection = -1;
+                }
+                t.localScale = new Vector3(scale, scale, 1);
+            }
+            else
+            {
+                scale -= scaleVelocity * scaleVelocity * Time.deltaTime;
+                if (scale < initialScale)
+                {
+                    scaling = false;
+                }
+                t.localScale = new Vector3(scale, scale, 1);
+            }
+        }
+
     }
 
     public void SetColor(Color col)
@@ -94,6 +129,17 @@ public class BackgroundParticle : MonoBehaviour
     {
         movingToDir = true;
         this.direction = initalPosition + (Vector3)direction;
+    }
+
+    public void ScaleWave()
+    {
+        if (scaling)
+        {
+            scale = initialScale;
+            t.localScale = new Vector3(scale, scale, 1);
+        }
+        scaling = true;
+        scaleDirection = 1;
     }
 
 }

@@ -303,322 +303,328 @@ public class GamePlayCode : MonoBehaviour
 
     }
 
-    // Update is called once per frame
     void Update()
     {
-        HState prevHState;
-        VState prevVstate;
-
-        if (!useHyro)
+        if (SongGenerator.isPlaying)
         {
-            Vector3 acc = Input.acceleration;
-            prevHState = hState;
-            prevVstate = vState;
-            if (acc.x < inStraightAccuracy && hState == HState.right)
-            {
-                hState = HState.straight;
-            }
-            else if (acc.x > -inStraightAccuracy && hState == HState.left)
-            {
-                hState = HState.straight;
-            }
-            else if (acc.x > inSideAccuracy && hState == HState.straight)
-            {
-                hState = HState.right;
-            }
-            else if (acc.x < -inSideAccuracy && hState == HState.straight)
-            {
-                hState = HState.left;
-            }
-
-            if (acc.y < inStraightAccuracy && vState == VState.up)
-            {
-                vState = VState.straight;
-            }
-            else if (acc.y > -inStraightAccuracy && vState == VState.down)
-            {
-                vState = VState.straight;
-            }
-            else if (acc.y > inSideAccuracy && vState == VState.straight)
-            {
-                vState = VState.up;
-            }
-            else if (acc.y < -inSideAccuracy && vState == VState.straight)
-            {
-                vState = VState.down;
-            }
-        }
-        else
-        {
-            if (Input.GetMouseButtonDown(0))
-            {
-                SetCurrentReadingAsFlat();
-            }
-
-            prevHState = hState;
-            prevVstate = vState;
-
-            Vector2 hyro = Get2DTilt();
-            if (hyro.x < inStraightAccuracy && hState == HState.right)
-            {
-                hState = HState.straight;
-            }
-            else if (hyro.x > -inStraightAccuracy && hState == HState.left)
-            {
-                hState = HState.straight;
-            }
-            else if (hyro.x > inSideAccuracy && hState == HState.straight)
-            {
-                hState = HState.right;
-            }
-            else if (hyro.x < -inSideAccuracy && hState == HState.straight)
-            {
-                hState = HState.left;
-            }
-
-            if (hyro.y < inStraightAccuracy && vState == VState.up)
-            {
-                vState = VState.straight;
-            }
-            else if (hyro.y > -inStraightAccuracy && vState == VState.down)
-            {
-                vState = VState.straight;
-            }
-            else if (hyro.y > inSideAccuracy && vState == VState.straight)
-            {
-                vState = VState.up;
-            }
-            else if (hyro.y < -inSideAccuracy && vState == VState.straight)
-            {
-                vState = VState.down;
-            }
-        }
 
 
-        if ((prevVstate == VState.straight && vState == VState.up) || Input.GetKeyDown(KeyCode.I))
-        {
-            //trigger up
-            if (tabScriptAcc.notesInJudgementZone.Count != 0)
+            HState prevHState;
+            VState prevVstate;
+
+            if (!useHyro)
             {
-                List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
-                Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
-                if (n.dir == ArrowDirection.up)
+                Vector3 acc = Input.acceleration;
+                prevHState = hState;
+                prevVstate = vState;
+                if (acc.x < inStraightAccuracy && hState == HState.right)
                 {
-                    n.Anihilate();
-                    Vibration.VibratePeek();
-                    EffectOnBackGround(Vector3.zero, colorUP, MAX_ACC_EFFECT_DISTANCE, 0.2f);
-                    EffectTilt(Vector3.zero, Vector2.up * 0.5f, MAX_ACC_EFFECT_DISTANCE);
+                    hState = HState.straight;
+                }
+                else if (acc.x > -inStraightAccuracy && hState == HState.left)
+                {
+                    hState = HState.straight;
+                }
+                else if (acc.x > inSideAccuracy && hState == HState.straight)
+                {
+                    hState = HState.right;
+                }
+                else if (acc.x < -inSideAccuracy && hState == HState.straight)
+                {
+                    hState = HState.left;
+                }
 
-                    ++combo;
-                    if (combo < 10)
-                        ChangeScore(score + 2);
-                    else if (combo < 50)
-                        ChangeScore(score + 5);
-                    else
-                        ChangeScore(score + 10);
-
-                    ChangeMaxScoreNow(NoteType.accNote);
-
-                    if (combo >= 10)
-                    {
-                        PrintNote("Combo x" + combo, new Vector3(0, 0, -5f), colorUP);
-                    }
-                    else
-                    {
-                        PrintNote("GREAT UP (+2)!", new Vector3(0, 0, -5f), colorUP);
-                    }
+                if (acc.y < inStraightAccuracy && vState == VState.up)
+                {
+                    vState = VState.straight;
+                }
+                else if (acc.y > -inStraightAccuracy && vState == VState.down)
+                {
+                    vState = VState.straight;
+                }
+                else if (acc.y > inSideAccuracy && vState == VState.straight)
+                {
+                    vState = VState.up;
+                }
+                else if (acc.y < -inSideAccuracy && vState == VState.straight)
+                {
+                    vState = VState.down;
                 }
             }
-        }
-        if ((prevVstate == VState.straight && vState == VState.down) || Input.GetKeyDown(KeyCode.K))
-        {
-            //trigger down
-            if (tabScriptAcc.notesInJudgementZone.Count != 0)
+            else
             {
-                List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
-                Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
-                if (n.dir == ArrowDirection.down)
+                if (Input.GetMouseButtonDown(0))
                 {
-                    n.Anihilate();
-                    Vibration.VibratePeek();
-                    EffectOnBackGround(Vector3.zero, colorDOWN, MAX_ACC_EFFECT_DISTANCE, 0.2f);
-                    EffectTilt(Vector3.zero, Vector2.down * 0.5f, MAX_ACC_EFFECT_DISTANCE);
+                    SetCurrentReadingAsFlat();
+                }
 
-                    ++combo;
-                    if (combo < 10)
-                        ChangeScore(score + 2);
-                    else if (combo < 50)
-                        ChangeScore(score + 5);
-                    else
-                        ChangeScore(score + 10);
+                prevHState = hState;
+                prevVstate = vState;
 
-                    ChangeMaxScoreNow(NoteType.accNote);
+                Vector2 hyro = Get2DTilt();
+                if (hyro.x < inStraightAccuracy && hState == HState.right)
+                {
+                    hState = HState.straight;
+                }
+                else if (hyro.x > -inStraightAccuracy && hState == HState.left)
+                {
+                    hState = HState.straight;
+                }
+                else if (hyro.x > inSideAccuracy && hState == HState.straight)
+                {
+                    hState = HState.right;
+                }
+                else if (hyro.x < -inSideAccuracy && hState == HState.straight)
+                {
+                    hState = HState.left;
+                }
 
-                    if (combo >= 10)
-                    {
-                        PrintNote("Combo x" + combo, new Vector3(0, 0, -5f), colorDOWN);
-                    }
-                    else
-                    {
-                        PrintNote("GREAT DOWN (+2)!", new Vector3(0, 0, -5f), colorDOWN);
-                    }
+                if (hyro.y < inStraightAccuracy && vState == VState.up)
+                {
+                    vState = VState.straight;
+                }
+                else if (hyro.y > -inStraightAccuracy && vState == VState.down)
+                {
+                    vState = VState.straight;
+                }
+                else if (hyro.y > inSideAccuracy && vState == VState.straight)
+                {
+                    vState = VState.up;
+                }
+                else if (hyro.y < -inSideAccuracy && vState == VState.straight)
+                {
+                    vState = VState.down;
                 }
             }
-        }
-        if ((prevHState == HState.straight && hState == HState.left) || Input.GetKeyDown(KeyCode.J))
-        {
-            if (tabScriptAcc.notesInJudgementZone.Count != 0)
+
+
+            if ((prevVstate == VState.straight && vState == VState.up) || Input.GetKeyDown(KeyCode.I))
             {
-                List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
-                Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
-                if (n.dir == ArrowDirection.left)
+                //trigger up
+                if (tabScriptAcc.notesInJudgementZone.Count != 0)
                 {
-                    n.Anihilate();
-                    Vibration.VibratePeek();
-                    EffectOnBackGround(Vector3.zero, colorLEFT, MAX_ACC_EFFECT_DISTANCE, 0.2f);
-                    EffectTilt(Vector3.zero, Vector2.left * 0.5f, MAX_ACC_EFFECT_DISTANCE);
-
-
-                    ++combo;
-                    if (combo < 10)
-                        ChangeScore(score + 2);
-                    else if (combo < 50)
-                        ChangeScore(score + 5);
-                    else
-                        ChangeScore(score + 10);
-
-                    ChangeMaxScoreNow(NoteType.accNote);
-
-                    if (combo >= 10)
+                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+                    Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
+                    if (n.dir == ArrowDirection.up)
                     {
-                        PrintNote("Combo x" + combo, new Vector3(0, 0, -5f), colorLEFT);
-                    }
-                    else
-                    {
-                        PrintNote("GREAT LEFT (+2)!", new Vector3(0, 0, -5f), colorLEFT);
-                    }
-                }
-            }
-        }
-        if ((prevHState == HState.straight && hState == HState.right) || Input.GetKeyDown(KeyCode.L))
-        {
-            if (tabScriptAcc.notesInJudgementZone.Count != 0)
-            {
-                List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
-                Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
-                if (n.dir == ArrowDirection.right)
-                {
-                    n.Anihilate();
-                    Vibration.VibratePeek();
-                    EffectOnBackGround(Vector3.zero, colorRIGHT, MAX_ACC_EFFECT_DISTANCE, 0.2f);
-                    EffectTilt(Vector3.zero, Vector2.right * 0.5f, MAX_ACC_EFFECT_DISTANCE);
+                        n.Anihilate();
+                        Vibration.VibratePeek();
+                        EffectOnBackGround(Vector3.zero, colorUP, MAX_ACC_EFFECT_DISTANCE, 0.2f);
+                        EffectTilt(Vector3.zero, Vector2.up * 0.5f, MAX_ACC_EFFECT_DISTANCE);
 
-                    ++combo;
-                    if (combo < 10)
-                        ChangeScore(score + 2);
-                    else if (combo < 50)
-                        ChangeScore(score + 5);
-                    else 
-                        ChangeScore(score + 10);
+                        ++combo;
+                        if (combo < 10)
+                            ChangeScore(score + 2);
+                        else if (combo < 50)
+                            ChangeScore(score + 5);
+                        else
+                            ChangeScore(score + 10);
 
-                    ChangeMaxScoreNow(NoteType.accNote);
+                        ChangeMaxScoreNow(NoteType.accNote);
 
-                    if (combo >= 10)
-                    {
-                        PrintNote("Combo x" + combo, new Vector3(0, 0, -5f), colorRIGHT);
-                    }
-                    else
-                    {
-                        PrintNote("GREAT RIGHT (+2)!", new Vector3(0, 0, -5f), colorRIGHT);
-                    }
-                }
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.W))
-            TouchTab(tabScript1, directionIndicator1, new Vector3(0, 0, -2), ArrowDirection.up);
-        if (Input.GetKeyDown(KeyCode.S))
-            TouchTab(tabScript1, directionIndicator1, new Vector3(0, 0, -2), ArrowDirection.down);
-        if (Input.GetKeyDown(KeyCode.A))
-            TouchTab(tabScript1, directionIndicator1, new Vector3(0, 0, -2), ArrowDirection.left);
-        if (Input.GetKeyDown(KeyCode.D))
-            TouchTab(tabScript1, directionIndicator1, new Vector3(0, 0, -2), ArrowDirection.right);
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-            TouchTab(tabScript2, directionIndicator2, new Vector3(0, 0, -2), ArrowDirection.up);
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-            TouchTab(tabScript2, directionIndicator2, new Vector3(0, 0, -2), ArrowDirection.down);
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-            TouchTab(tabScript2, directionIndicator2, new Vector3(0, 0, -2), ArrowDirection.left);
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-            TouchTab(tabScript2, directionIndicator2, new Vector3(0, 0, -2), ArrowDirection.right);
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            //EffectOnBackGround(Vector3.zero, colorRIGHT, MAX_ACC_EFFECT_DISTANCE, 0.2f);
-            EffectTilt(Vector3.zero, Vector2.right * 0.5f, MAX_ACC_EFFECT_DISTANCE);
-        }
-
-
-        if (Input.touchCount > 0)
-        {
-            Touch[] touches = Input.touches;
-            foreach (Touch t in touches)
-            {
-                if (t.phase == TouchPhase.Began)
-                {
-                    Vector3 pos = Camera.main.ScreenToWorldPoint(t.position);
-                    pos = new Vector3(pos.x, pos.y, -5f);
-                    Debug.Log(pos);
-                    Vector3 tab1Scale = tab1Transform.localScale;
-                    Vector3 tab2Scale = tab2Transform.localScale;
-                    if (pos.x < (tab1Transform.position.x + (tab1Scale.x / 2f)) && pos.x > (tab1Transform.position.x - (tab1Scale.x / 2f)) &&
-                        pos.y < (tab1Transform.position.y + (tab1Scale.y / 2f)) && pos.y > (tab1Transform.position.y - (tab1Scale.y / 2f)))
-                    {
-                        currentTouches.Add(new TouchInfo(t, t.position, 1));
-                        //TouchTab(tabScript1, pos);
-                        //EffectOnBackGround(pos, col1);
-                    }
-                    if (pos.x < (tab2Transform.position.x + (tab2Scale.x / 2f)) && pos.x > (tab2Transform.position.x - (tab2Scale.x / 2f)) &&
-                        pos.y < (tab2Transform.position.y + (tab2Scale.y / 2f)) && pos.y > (tab2Transform.position.y - (tab2Scale.y / 2f)))
-                    {
-                        //TouchTab(tabScript2, pos);
-                        //EffectOnBackGround(pos, col2);
-                        currentTouches.Add(new TouchInfo(t, t.position, 2));
-                    }
-                }
-                if (t.phase == TouchPhase.Ended)
-                {
-                    if (currentTouches.Exists(x=>(x.t.fingerId == t.fingerId)))
-                    {
-                        TouchInfo ti = currentTouches.Find(x => (x.t.fingerId == t.fingerId));
-                        Vector2 delta = t.position - ti.pos;
-                        Debug.Log(delta);
-                        ArrowDirection dir;
-                        if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+                        if (combo >= 10)
                         {
-                            if (delta.x > 0)
-                                dir = ArrowDirection.right;
-                            else
-                                dir = ArrowDirection.left;
+                            PrintNote("Combo x" + combo, new Vector3(0, 0, -5f), colorUP);
                         }
                         else
                         {
-                            if (delta.y > 0)
-                                dir = ArrowDirection.up;
-                            else
-                                dir = ArrowDirection.down;
+                            PrintNote("GREAT UP (+2)!", new Vector3(0, 0, -5f), colorUP);
                         }
-                        if (ti.tabIndex == 1)
-                        {
-                            TouchTab(tabScript1, directionIndicator1, ti.pos, dir);
-                        }
-                        else
-                        {
-                            TouchTab(tabScript2, directionIndicator2, ti.pos, dir);
-                        }
-                        currentTouches.Remove(ti);
                     }
                 }
             }
+            if ((prevVstate == VState.straight && vState == VState.down) || Input.GetKeyDown(KeyCode.K))
+            {
+                //trigger down
+                if (tabScriptAcc.notesInJudgementZone.Count != 0)
+                {
+                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+                    Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
+                    if (n.dir == ArrowDirection.down)
+                    {
+                        n.Anihilate();
+                        Vibration.VibratePeek();
+                        EffectOnBackGround(Vector3.zero, colorDOWN, MAX_ACC_EFFECT_DISTANCE, 0.2f);
+                        EffectTilt(Vector3.zero, Vector2.down * 0.5f, MAX_ACC_EFFECT_DISTANCE);
+
+                        ++combo;
+                        if (combo < 10)
+                            ChangeScore(score + 2);
+                        else if (combo < 50)
+                            ChangeScore(score + 5);
+                        else
+                            ChangeScore(score + 10);
+
+                        ChangeMaxScoreNow(NoteType.accNote);
+
+                        if (combo >= 10)
+                        {
+                            PrintNote("Combo x" + combo, new Vector3(0, 0, -5f), colorDOWN);
+                        }
+                        else
+                        {
+                            PrintNote("GREAT DOWN (+2)!", new Vector3(0, 0, -5f), colorDOWN);
+                        }
+                    }
+                }
+            }
+            if ((prevHState == HState.straight && hState == HState.left) || Input.GetKeyDown(KeyCode.J))
+            {
+                if (tabScriptAcc.notesInJudgementZone.Count != 0)
+                {
+                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+                    Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
+                    if (n.dir == ArrowDirection.left)
+                    {
+                        n.Anihilate();
+                        Vibration.VibratePeek();
+                        EffectOnBackGround(Vector3.zero, colorLEFT, MAX_ACC_EFFECT_DISTANCE, 0.2f);
+                        EffectTilt(Vector3.zero, Vector2.left * 0.5f, MAX_ACC_EFFECT_DISTANCE);
+
+
+                        ++combo;
+                        if (combo < 10)
+                            ChangeScore(score + 2);
+                        else if (combo < 50)
+                            ChangeScore(score + 5);
+                        else
+                            ChangeScore(score + 10);
+
+                        ChangeMaxScoreNow(NoteType.accNote);
+
+                        if (combo >= 10)
+                        {
+                            PrintNote("Combo x" + combo, new Vector3(0, 0, -5f), colorLEFT);
+                        }
+                        else
+                        {
+                            PrintNote("GREAT LEFT (+2)!", new Vector3(0, 0, -5f), colorLEFT);
+                        }
+                    }
+                }
+            }
+            if ((prevHState == HState.straight && hState == HState.right) || Input.GetKeyDown(KeyCode.L))
+            {
+                if (tabScriptAcc.notesInJudgementZone.Count != 0)
+                {
+                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+                    Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
+                    if (n.dir == ArrowDirection.right)
+                    {
+                        n.Anihilate();
+                        Vibration.VibratePeek();
+                        EffectOnBackGround(Vector3.zero, colorRIGHT, MAX_ACC_EFFECT_DISTANCE, 0.2f);
+                        EffectTilt(Vector3.zero, Vector2.right * 0.5f, MAX_ACC_EFFECT_DISTANCE);
+
+                        ++combo;
+                        if (combo < 10)
+                            ChangeScore(score + 2);
+                        else if (combo < 50)
+                            ChangeScore(score + 5);
+                        else
+                            ChangeScore(score + 10);
+
+                        ChangeMaxScoreNow(NoteType.accNote);
+
+                        if (combo >= 10)
+                        {
+                            PrintNote("Combo x" + combo, new Vector3(0, 0, -5f), colorRIGHT);
+                        }
+                        else
+                        {
+                            PrintNote("GREAT RIGHT (+2)!", new Vector3(0, 0, -5f), colorRIGHT);
+                        }
+                    }
+                }
+            }
+
+            if (Input.GetKeyDown(KeyCode.W))
+                TouchTab(tabScript1, directionIndicator1, new Vector3(0, 0, -2), ArrowDirection.up);
+            if (Input.GetKeyDown(KeyCode.S))
+                TouchTab(tabScript1, directionIndicator1, new Vector3(0, 0, -2), ArrowDirection.down);
+            if (Input.GetKeyDown(KeyCode.A))
+                TouchTab(tabScript1, directionIndicator1, new Vector3(0, 0, -2), ArrowDirection.left);
+            if (Input.GetKeyDown(KeyCode.D))
+                TouchTab(tabScript1, directionIndicator1, new Vector3(0, 0, -2), ArrowDirection.right);
+            if (Input.GetKeyDown(KeyCode.UpArrow))
+                TouchTab(tabScript2, directionIndicator2, new Vector3(0, 0, -2), ArrowDirection.up);
+            if (Input.GetKeyDown(KeyCode.DownArrow))
+                TouchTab(tabScript2, directionIndicator2, new Vector3(0, 0, -2), ArrowDirection.down);
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+                TouchTab(tabScript2, directionIndicator2, new Vector3(0, 0, -2), ArrowDirection.left);
+            if (Input.GetKeyDown(KeyCode.RightArrow))
+                TouchTab(tabScript2, directionIndicator2, new Vector3(0, 0, -2), ArrowDirection.right);
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                //EffectOnBackGround(Vector3.zero, colorRIGHT, MAX_ACC_EFFECT_DISTANCE, 0.2f);
+                EffectTilt(Vector3.zero, Vector2.right * 0.5f, MAX_ACC_EFFECT_DISTANCE);
+                ScaleBackground();
+            }
+
+
+            if (Input.touchCount > 0)
+            {
+                Touch[] touches = Input.touches;
+                foreach (Touch t in touches)
+                {
+                    if (t.phase == TouchPhase.Began)
+                    {
+                        Vector3 pos = Camera.main.ScreenToWorldPoint(t.position);
+                        pos = new Vector3(pos.x, pos.y, -5f);
+                        Debug.Log(pos);
+                        Vector3 tab1Scale = tab1Transform.localScale;
+                        Vector3 tab2Scale = tab2Transform.localScale;
+                        if (pos.x < (tab1Transform.position.x + (tab1Scale.x / 2f)) && pos.x > (tab1Transform.position.x - (tab1Scale.x / 2f)) &&
+                            pos.y < (tab1Transform.position.y + (tab1Scale.y / 2f)) && pos.y > (tab1Transform.position.y - (tab1Scale.y / 2f)))
+                        {
+                            currentTouches.Add(new TouchInfo(t, t.position, 1));
+                            //TouchTab(tabScript1, pos);
+                            //EffectOnBackGround(pos, col1);
+                        }
+                        if (pos.x < (tab2Transform.position.x + (tab2Scale.x / 2f)) && pos.x > (tab2Transform.position.x - (tab2Scale.x / 2f)) &&
+                            pos.y < (tab2Transform.position.y + (tab2Scale.y / 2f)) && pos.y > (tab2Transform.position.y - (tab2Scale.y / 2f)))
+                        {
+                            //TouchTab(tabScript2, pos);
+                            //EffectOnBackGround(pos, col2);
+                            currentTouches.Add(new TouchInfo(t, t.position, 2));
+                        }
+                    }
+                    if (t.phase == TouchPhase.Ended)
+                    {
+                        if (currentTouches.Exists(x => (x.t.fingerId == t.fingerId)))
+                        {
+                            TouchInfo ti = currentTouches.Find(x => (x.t.fingerId == t.fingerId));
+                            Vector2 delta = t.position - ti.pos;
+                            Debug.Log(delta);
+                            ArrowDirection dir;
+                            if (Mathf.Abs(delta.x) > Mathf.Abs(delta.y))
+                            {
+                                if (delta.x > 0)
+                                    dir = ArrowDirection.right;
+                                else
+                                    dir = ArrowDirection.left;
+                            }
+                            else
+                            {
+                                if (delta.y > 0)
+                                    dir = ArrowDirection.up;
+                                else
+                                    dir = ArrowDirection.down;
+                            }
+                            if (ti.tabIndex == 1)
+                            {
+                                TouchTab(tabScript1, directionIndicator1, ti.pos, dir);
+                            }
+                            else
+                            {
+                                TouchTab(tabScript2, directionIndicator2, ti.pos, dir);
+                            }
+                            currentTouches.Remove(ti);
+                        }
+                    }
+                }
+            }
+
         }
 
     }
@@ -646,11 +652,21 @@ public class GamePlayCode : MonoBehaviour
 
                 BackgroundParticle bpScript = bp.GetComponent<BackgroundParticle>();
                 bpScript.rotationalVelocity = maxVelocity * (maxDist - dist);
+                bpScript.rotationalDirection = -bpScript.rotationalDirection;
                 bpScript.SetColor((maxDist - intencity * dist) / maxDist * col + 
                                   (dist / maxDist) * bp.GetComponent<SpriteRenderer>().color + 
                                   new Color(Random.Range(-0.02f, 0.02f), Random.Range(-0.02f, 0.02f), Random.Range(-0.02f, 0.02f)));
 
             }
+        }
+    }
+
+    private void ScaleBackground()
+    {
+        foreach (GameObject bp in GetComponent<GenerateGrid>().backgroundParticles)
+        {
+            BackgroundParticle bpScript = bp.GetComponent<BackgroundParticle>();
+            bpScript.ScaleWave();
         }
     }
 
@@ -663,12 +679,14 @@ public class GamePlayCode : MonoBehaviour
             {
                 BackgroundParticle bpScript = bp.GetComponent<BackgroundParticle>();
                 bpScript.MoveTo(dir * Random.Range(0.9f, 1.1f) * (maxDist - dist) / maxDist);
+                bpScript.rotationalDirection = -bpScript.rotationalDirection;
             }
         }
     }
 
     public void TouchTab(TabScript tabScript, GameObject directionIndicator, Vector3 pos, ArrowDirection dir)
     {
+        ScaleBackground();
         Vector3 effectPos = Camera.main.ScreenToWorldPoint(pos);
         effectPos = new Vector3(effectPos.x, effectPos.y, -5f);
         if (tabScript.notesInJudgementZone.Count != 0)
@@ -763,9 +781,8 @@ public class GamePlayCode : MonoBehaviour
         }
     }
 
-    public void ExitGamePlay()
+    public void SaveRecords()
     {
-        sTransition.FadeOut();
         transportedData.currentSong.lastTryScore = score;
         PlayerPrefs.SetInt(MyUtitities.scoreSaveFlag + "lastTry__" + transportedData.currentSong.songName, transportedData.currentSong.lastTryScore);
         //DONT DO IT EVERY TIME!!
@@ -775,6 +792,12 @@ public class GamePlayCode : MonoBehaviour
             transportedData.currentSong.songRecord = transportedData.currentSong.lastTryScore;
             PlayerPrefs.SetInt(MyUtitities.scoreSaveFlag + transportedData.currentSong.songName, transportedData.currentSong.songRecord);
         }
+    }
+
+    public void ExitGamePlay()
+    {
+        sTransition.FadeOut();
+        SaveRecords();
         Invoke("MoveToMenu", 1);
     }
 

@@ -3,7 +3,7 @@
     "m_SelectedProcess": {
         "deviceId": "R5CT80JSVGY",
         "name": "com.Kladovka.RhythmAndShake",
-        "processId": 31856,
+        "processId": 16900,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -60,6 +60,48 @@
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
             "processId": 31856,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 19162,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 2725,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 6038,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 7399,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 8201,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 8810,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 16900,
             "exited": false
         }
     ],

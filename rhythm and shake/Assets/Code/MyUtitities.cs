@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using System;
+using System.IO;
 
 
 
 public class MyUtitities
 {
     public static string scoreSaveFlag = "score__";
+    public static string lastRewardFlag = "lastRevard__";
+
 
     public static void SaveSongToAndroid(Song track, string fileName)
     {
@@ -65,6 +68,29 @@ public class MyUtitities
             }
         }
         throw new Exception("No network adapters with an IPv4 address in the system!");
+    }
+
+    public static Texture2D LoadTexture(string FilePath)
+    {
+        Texture2D Tex2D;
+        byte[] FileData;
+        if (File.Exists(FilePath))
+        {
+            FileData = File.ReadAllBytes(FilePath);
+            Tex2D = new Texture2D(2, 2);
+            if (Tex2D.LoadImage(FileData))
+                return Tex2D; 
+        }
+        return null;                     
+    }
+
+    public static Sprite LoadNewSprite(string FilePath, SpriteMeshType spriteType = SpriteMeshType.Tight)
+    {
+        Texture2D SpriteTexture = LoadTexture(FilePath);
+        if (SpriteTexture == null) 
+            return null;
+        Sprite NewSprite = Sprite.Create(SpriteTexture, new Rect(0, 0, SpriteTexture.width, SpriteTexture.height), new Vector2(0.5f, 0.5f), Mathf.Max(SpriteTexture.width, SpriteTexture.height), 0, spriteType);
+        return NewSprite;
     }
 
 

@@ -32,7 +32,10 @@ public class Note : MonoBehaviour
 
     void Update()
     {
-        t.position += Vector3.right * Time.deltaTime * velocity;
+        if (SongGenerator.isPlaying)
+        {
+            t.position += Vector3.right * Time.deltaTime * velocity;
+        }
         if (t.position.x > 10)
         {
             Destroy(gameObject);

@@ -29,6 +29,10 @@ public class MainMenu : MonoBehaviour
     Transform cubeT;
 
 
+    GameObject cubeObj;
+    GameObject shopObj;
+
+
     float targetRot;
     float rotY;
 
@@ -100,6 +104,9 @@ public class MainMenu : MonoBehaviour
                             TouchInfo ti = currentTouches.Find(x => (x.t.fingerId == t.fingerId));
                             Vector2 delta = Camera.main.ScreenToWorldPoint(t.position) - Camera.main.ScreenToWorldPoint(ti.pos);
                             Debug.Log(t.position + " " + ti.pos + " " + delta);
+                            //here a bug may sit! Just know it! 
+                            //we clear current touches in any case as we don't want problems with questionalble starting points
+                            currentTouches.Clear();
                             if (Mathf.Abs(delta.x) > 1.25)
                             {
                                 if (delta.x < 0)
@@ -130,9 +137,8 @@ public class MainMenu : MonoBehaviour
                                     if (state > 3) state = 0;
                                     if (state < 0) state = 3;
                                 }
-                                currentTouches.Remove(ti);
                             }
-                            else
+                            else if(delta.magnitude < 0.5f)
                             {
                                 if (!rotating)
                                 {
@@ -176,6 +182,14 @@ public class MainMenu : MonoBehaviour
                 state += dir;
                 if (state > 3) state = 0;
                 if (state < 0) state = 3;
+            }
+
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                if (state == 0)
+                {
+                    OpenLevelSelect();
+                }
             }
 
             if (rotating)
@@ -244,6 +258,17 @@ public class MainMenu : MonoBehaviour
         lvlSelection.PrepareMenu();
         inMainMenu = false;
 
+    }
+
+    public void MoveToMainMenu()
+    {
+        lvlSelection.PrepareMenuExit();
+        inMainMenu = true;
+        DeactivateAll();
+        ActiveMainState();
+        cubeT.gameObject.SetActive(true);
+        state = 0;
+        inMainMenu = true;
     }
 
 }
