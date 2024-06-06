@@ -15,47 +15,78 @@ public class AudioDownloader : MonoBehaviour
     [SerializeField]
     TransportedData td;
 
+
+
     private int processed;
+
+
 
 
     void Start()
     {
+        if (!PlayerPrefs.HasKey("TUTORIAL_DONE"))
+        {
+            SceneManager.LoadScene("Tutorial");
+            return;
+        }
+
         processed = 0;
         DirectoryInfo dir = new DirectoryInfo(Application.persistentDataPath + "/songs");
-        FileInfo[] info = dir.GetFiles("*.wav");
-        int index = 0;
-        td.deletctedAudioFiles = new List<AudioInfo>();
-        td.detectedJsonFiles = new List<JsonInfo>();
-        foreach (FileInfo i in info)
+        if (!dir.Exists)
         {
-            AudioInfo ai = new AudioInfo();
-            ai.name = i.Name;
-            StartCoroutine(GetAudioClip("songs/" + i.Name, index, AudioType.WAV));
-            td.deletctedAudioFiles.Add(ai);
-            ++index;
+            dir.Create();
+            //Here we can init ourselves later
+            SceneManager.LoadScene("SampleScene");
         }
-        dir = new DirectoryInfo(Application.persistentDataPath);
-        info = dir.GetFiles("*.json");
-        foreach (FileInfo i in info)
+        else
         {
-            JsonInfo ji = new JsonInfo();
-            ji.name = i.Name;
-            ji.json = System.IO.File.ReadAllText(Application.persistentDataPath + "/" + i.Name);
-            td.detectedJsonFiles.Add(ji);
+            int index = 0;
+
+            FileInfo[] wavFileInfos = dir.GetFiles("*.wav");
+            FileInfo[] mpegFileInfos = dir.GetFiles("*.mp3");
+            dir = new DirectoryInfo(Application.persistentDataPath);
+            FileInfo[] jsonFileInfos = dir.GetFiles("*.json");
+
+            td.detectedAudioFiles = new List<AudioInfo>();
+            td.detectedJsonFiles = new List<JsonInfo>();
+            
+            foreach (FileInfo wavFileInfo in wavFileInfos)
+            {
+                AudioInfo ai = new AudioInfo();
+                ai.name = wavFileInfo.Name;
+                StartCoroutine(GetAudioClip("songs/" + wavFileInfo.Name, index, AudioType.WAV));
+                td.detectedAudioFiles.Add(ai);
+                ++index;
+            }
+            foreach (FileInfo mpegFileInfo in mpegFileInfos)
+            {
+                AudioInfo ai = new AudioInfo();
+                ai.name = mpegFileInfo.Name;
+                StartCoroutine(GetAudioClip("songs/" + mpegFileInfo.Name, index, AudioType.MPEG));
+                td.detectedAudioFiles.Add(ai);
+                ++index;
+            }
+            foreach (FileInfo i in jsonFileInfos)
+            {
+                JsonInfo ji = new JsonInfo();
+                ji.name = i.Name;
+                ji.json = System.IO.File.ReadAllText(Application.persistentDataPath + "/" + i.Name);
+                td.detectedJsonFiles.Add(ji);
+            }
         }
     }
 
     void Update()
     {
-        if (processed == td.deletctedAudioFiles.Count)
+        if (processed == td.detectedAudioFiles.Count)
         {
             if (!audioSource.isPlaying)
             {
                 Debug.Log("We have loaded all the tracks.");
                 string msg = "List of loaded tracks:\n";
-                for (int i = 0; i < td.deletctedAudioFiles.Count; ++i)
+                for (int i = 0; i < td.detectedAudioFiles.Count; ++i)
                 {
-                    msg += td.deletctedAudioFiles[i].name + "\n";
+                    msg += td.detectedAudioFiles[i].name + "\n";
                 }
                 Debug.Log(msg);
                 SceneManager.LoadScene("SampleScene");
@@ -65,7 +96,6 @@ public class AudioDownloader : MonoBehaviour
 
     IEnumerator GetAudioClip(string fileName, int index, AudioType audioType)
     {
-        //change to mp3
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + Application.persistentDataPath + "/" + fileName, audioType))
         {
             yield return www.SendWebRequest();
@@ -76,15 +106,14 @@ public class AudioDownloader : MonoBehaviour
             }
             else
             {
-                td.deletctedAudioFiles[index].clip = DownloadHandlerAudioClip.GetContent(www);
+                td.detectedAudioFiles[index].clip = DownloadHandlerAudioClip.GetContent(www);
                 ++processed;
             }
         }
     }
 
-    public static IEnumerator GetAndPlayAudioClip(string fileName, AudioType audioType, AudioSource source)
+    public static IEnumerator NET_GetAudioClip(string fileName, AudioType audioType)
     {
-        //change to mp3
         using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip("file://" + Application.persistentDataPath + "/" + fileName, audioType))
         {
             yield return www.SendWebRequest();
@@ -95,8 +124,7 @@ public class AudioDownloader : MonoBehaviour
             }
             else
             {
-                source.clip = DownloadHandlerAudioClip.GetContent(www);
-                source.Play();
+                NetworkStatus.song.audio = DownloadHandlerAudioClip.GetContent(www);
             }
         }
     }

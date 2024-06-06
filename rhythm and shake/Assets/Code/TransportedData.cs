@@ -20,6 +20,14 @@ public class TransportedData : ScriptableObject
     public Song currentSong;
     public int currentMenuIndex;
 
-    public List<AudioInfo> deletctedAudioFiles;
+    public static bool enableMainMenu = true;
+    public static HandMode handMode = HandMode.right;
+    public static int scoreDelta = 0;
+
+
+    //shopping constancts
+    public static bool[] downloaded = new bool[3] { false, false, false };
+
+    public List<AudioInfo> detectedAudioFiles;
     public List<JsonInfo> detectedJsonFiles;
 }

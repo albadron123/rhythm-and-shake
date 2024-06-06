@@ -30,7 +30,12 @@ public class MyUtitities
     public static void LoadSongFromAndroid(ref Song song, string fileName)
     {
         string filePath = Application.persistentDataPath;
-        string jsonSongText = System.IO.File.ReadAllText(filePath + "/" + fileName);
+        LoadSongFromPath(ref song, filePath + "/" + fileName);
+    }
+    public static void LoadSongFromPath(ref Song song, string totalPath)
+    {
+        string filePath = Application.persistentDataPath;
+        string jsonSongText = System.IO.File.ReadAllText(totalPath);
         JsonSong jsonSong = JsonUtility.FromJson<JsonSong>(jsonSongText);
         song.songName = jsonSong.songName;
         song.authorName = jsonSong.authorName;
@@ -91,6 +96,27 @@ public class MyUtitities
             return null;
         Sprite NewSprite = Sprite.Create(SpriteTexture, new Rect(0, 0, SpriteTexture.width, SpriteTexture.height), new Vector2(0.5f, 0.5f), Mathf.Max(SpriteTexture.width, SpriteTexture.height), 0, spriteType);
         return NewSprite;
+    }
+
+    public static byte[] IntToByteArray(int number)
+    {
+        return new byte[4] { (byte)number, (byte)(number >> 8), (byte)(number >> 16), (byte)(number >> 24) };
+    }
+
+    //IMPORTANT: VERY MUCH NOT OPTIMAL
+    public static int ByteArrayToInt(byte[] array, int initialIndex)
+    {
+        return (int)array[initialIndex] + ((int)array[initialIndex+1] << 8) + ((int)array[initialIndex+2] << 16) + ((int)array[initialIndex+3] << 24);
+    }
+
+    public static void LogByteArray(byte[] array, int size)
+    {
+        string s = "";
+        for (int i = 0; i < size; ++i)
+        {
+            s += ((char)array[i]).ToString();
+        }
+        Debug.Log(s);
     }
 
 

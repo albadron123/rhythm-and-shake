@@ -3145,6 +3145,7 @@ MonoBehaviour:
   minSize: 3.2
   increaseVelocity: 2.5
   decreaseVelocity: 2
+  isArrowTab: 0
 --- !u!212 &1491812972
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3384,7 +3385,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1932302243}
         m_TargetAssemblyTypeName: SongGenerator, Assembly-CSharp
-        m_MethodName: PauseSong
+        m_MethodName: PauseSongWithButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3513,6 +3514,7 @@ MonoBehaviour:
   minSize: 3.2
   increaseVelocity: 2.5
   decreaseVelocity: 2
+  isArrowTab: 0
 --- !u!212 &1710681003
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3876,6 +3878,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 235de0238a34ece49ac9171aca1b6fc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SongLayountT: {fileID: 2072038194}
   pauseMenu: {fileID: 1945404060}
   classicNotePrefab: {fileID: 1326750441228620024, guid: eca271162c0ba61499738b6288b88c02, type: 3}
   leftNotePrefab: {fileID: 4040071111804758756, guid: 8ce005324be888f4c9061e06c53fe9dd, type: 3}
@@ -4002,7 +4005,6 @@ MonoBehaviour:
   delay: 0.9
   inMultiplayer: 0
   td: {fileID: 11400000, guid: 0edf9c2a8e78f5948a04aad040739843, type: 2}
-  judgementPosition: {x: 0, y: 0, z: 0}
 --- !u!82 &1932302244
 AudioSource:
   m_ObjectHideFlags: 0
@@ -4112,7 +4114,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sTransition: {fileID: 2018975704}
-  nV: {fileID: 0}
   te: {fileID: 811489774}
   transportedData: {fileID: 11400000, guid: 0edf9c2a8e78f5948a04aad040739843, type: 2}
   tab1Transform: {fileID: 1491812973}
@@ -4131,6 +4132,9 @@ MonoBehaviour:
   scoreSladerT: {fileID: 1304224039}
   maxScoreNowIndicatorT: {fileID: 582828181}
   maxScoreNowSladerT: {fileID: 542711784}
+  hisScoreText: {fileID: 0}
+  hisScoreIndicatorT: {fileID: 0}
+  hisScoreSliderT: {fileID: 0}
   combo: 0
   maxComboNow: 0
   inSideAccuracy: 0.4
@@ -4278,6 +4282,7 @@ MonoBehaviour:
   minSize: 0
   increaseVelocity: 0
   decreaseVelocity: 0
+  isArrowTab: 1
 --- !u!212 &2012772080
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4616,6 +4621,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &2072038193
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2072038194}
+  m_Layer: 0
+  m_Name: SongLayont
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2072038194
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2072038193}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2080752172
 GameObject:
   m_ObjectHideFlags: 0
@@ -9486,3 +9522,4 @@ SceneRoots:
   - {fileID: 135936034}
   - {fileID: 2040411642}
   - {fileID: 1945404061}
+  - {fileID: 2072038194}

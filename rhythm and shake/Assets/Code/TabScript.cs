@@ -29,10 +29,22 @@ public class TabScript : MonoBehaviour
     [SerializeField]
     float decreaseVelocity;
 
+    [SerializeField]
+    bool isArrowTab = false;
+
     void Start()
     {
         t = transform;
         sr = GetComponent<SpriteRenderer>(); 
+        if (!isArrowTab)
+        {
+            BoxCollider2D col = GetComponent<BoxCollider2D>();
+            col.offset = new Vector2(-Mathf.Sign((int)TransportedData.handMode - 0.5f) * col.offset.x, col.offset.y);
+        }
+        else
+        {
+            t.position = new Vector3(-Mathf.Sign((int)TransportedData.handMode - 0.5f)*t.position.x, t.position.y, t.position.z);
+        }
     }
 
     void Update()

@@ -10,7 +10,7 @@ public class Note : MonoBehaviour
     [SerializeField]
     GameObject plarticle;
 
-    public float velocity;
+    public float velocity = 1;
 
     Transform t;
 
@@ -24,21 +24,57 @@ public class Note : MonoBehaviour
 
     public bool hasDir = false;
 
+    GamePlayCode gameplay;
+
+    bool inTutorial = false;
+
     void Start()
     {
+        gameplay = GameObject.Find("Main Camera").GetComponent<GamePlayCode>();
         sr = GetComponent<SpriteRenderer>();
         t = transform;
+        if (GameObject.Find("Main Camera").GetComponent<BasicDialing>() != null) inTutorial = true;
+        else inTutorial = false;
     }
 
     void Update()
     {
-        if (SongGenerator.isPlaying)
+        if (inTutorial)
         {
-            t.position += Vector3.right * Time.deltaTime * velocity;
+            t.position += Vector3.right * Time.deltaTime * velocity * 0.75f;
+            if (t.position.x > 2.5f)
+            {
+                if (TutorialEvents.tutorialStage > 1)
+                {
+                    TutorialTab.successCount = 0;
+                    BasicDialing.DestroyAllNotesOnFail();
+                    //failedDialogue3
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!                                         TUTORIAL MISTAKE
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    //YOU SHOULD PUT FAIL MESSAGE HERE!!!!!!!!!!!!!!!!!!!!!
+                    BasicDialing db = GameObject.Find("Main Camera").GetComponent<BasicDialing>();
+                    db.PlayThreeNotes();
+                    db.SkipTo(42);
+                }
+                else if(TutorialEvents.tutorialStage == 1) 
+                    GameObject.Find("Main Camera").GetComponent<SongGenerator>().GenerateNote(new Vector3(0, transform.position.y, transform.position.z) - new Vector3(3, 0, 0), ArrowDirection.no);
+                Destroy(gameObject);
+            }
         }
-        if (t.position.x > 10)
+        else
         {
-            Destroy(gameObject);
+            if (-Mathf.Sign((float)TransportedData.handMode - 0.5f) * t.position.x > 10)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
@@ -86,11 +122,12 @@ public class Note : MonoBehaviour
             {
                 myTabScript.notesInJudgementZone.Remove(gameObject);
                 inJundgementZone = false;
-                GamePlayCode gameplay = GameObject.Find("Main Camera").GetComponent<GamePlayCode>();
                 gameplay.PrintNote("Too late!", t.position, sr.color);
                 gameplay.combo = 0;
                 gameplay.ChangeMaxScoreNow(type);
             }
         }
     }
+
+    
 }

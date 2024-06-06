@@ -6,6 +6,7 @@ TagManager:
   tags:
   - tab
   - scoreText
+  - NOTETAG
   - scoreIcon
   layers:
   - Default

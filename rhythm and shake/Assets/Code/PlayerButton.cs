@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PlayerButton : MonoBehaviour
 {
-    public enum ButtonType { leftShift, rightShift, play};
+    public enum ButtonType { leftShift, rightShift, play, server};
     [SerializeField]
     ButtonType buttonType;
 
@@ -13,9 +13,6 @@ public class PlayerButton : MonoBehaviour
     LevelSelection levelSelection;
 
     SpriteRenderer sr;
-
-    [SerializeField]
-    GameplayServer gs;
 
     void Start()
     {
@@ -43,16 +40,13 @@ public class PlayerButton : MonoBehaviour
         }
         if (buttonType == ButtonType.play)
         {
-            if (LevelSelection.currentSongInMultiplayer)
-            {
-                //start and finish server later
-                //now just start if not started
-                gs.StartServer();
-            }
-            else
-            {
-                levelSelection.PlaySong();
-            }
+            levelSelection.PlaySong();
+        }
+        if (buttonType == ButtonType.server)
+        {
+            NetServer server = GameObject.Find("NET").GetComponent<NetServer>();
+            server.ConnectDisconnect();
+            //later shutDownServer
         }
         sr.color = new Color(1, 1, 1, 0.2f);
     }

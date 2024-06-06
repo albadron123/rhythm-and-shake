@@ -23,6 +23,7 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     Shopkeeper shopkeeper;
 
+    [SerializeField]
     LevelSelection lvlSelection;
 
     [SerializeField]
@@ -72,7 +73,6 @@ public class MainMenu : MonoBehaviour
         dir = 1;
         rotating = true;
         realRotVelocity = 0.5f * rotVelocity;
-        lvlSelection = GetComponent<LevelSelection>();
     }
 
 
@@ -222,6 +222,10 @@ public class MainMenu : MonoBehaviour
 
     }
 
+    public void MoveToTutorial()
+    {
+        SceneManager.LoadScene("Tutorial");
+    }
 
     public void ActiveMainState()
     {

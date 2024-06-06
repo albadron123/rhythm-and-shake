@@ -16,6 +16,10 @@ PrefabInstance:
       propertyPath: dir
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 6219123028947691918, guid: eca271162c0ba61499738b6288b88c02, type: 3}
+      propertyPath: velocity
+      value: 1.75
+      objectReference: {fileID: 0}
     - target: {fileID: 7270908908112157040, guid: eca271162c0ba61499738b6288b88c02, type: 3}
       propertyPath: m_IsActive
       value: 1

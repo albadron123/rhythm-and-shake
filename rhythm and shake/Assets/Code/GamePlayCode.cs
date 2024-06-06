@@ -8,14 +8,14 @@ public enum NoteType {simple, accNote}
 
 public class GamePlayCode : MonoBehaviour
 {
+
+
+
     const float MAX_NOTE_EFFECT_DISTANCE = 10.0f;
     const float MAX_ACC_EFFECT_DISTANCE = 10.0f;
 
     [SerializeField]
     SceneTransition sTransition;
-
-    [SerializeField]
-    NetworkVar nV = null;
 
     Transform myTransform;
 
@@ -77,6 +77,13 @@ public class GamePlayCode : MonoBehaviour
     Transform maxScoreNowIndicatorT;
     [SerializeField]
     Transform maxScoreNowSladerT;
+
+    [SerializeField]
+    TMPro.TMP_Text hisScoreText;
+    [SerializeField]
+    Transform hisScoreIndicatorT;
+    [SerializeField]
+    Transform hisScoreSliderT;
 
 
     int score = 0;
@@ -403,7 +410,7 @@ public class GamePlayCode : MonoBehaviour
                 //trigger up
                 if (tabScriptAcc.notesInJudgementZone.Count != 0)
                 {
-                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => -Mathf.Sign((float)TransportedData.handMode - 0.5f) * x.transform.position.x).ToList();
                     Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
                     if (n.dir == ArrowDirection.up)
                     {
@@ -438,7 +445,7 @@ public class GamePlayCode : MonoBehaviour
                 //trigger down
                 if (tabScriptAcc.notesInJudgementZone.Count != 0)
                 {
-                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => -Mathf.Sign((float)TransportedData.handMode - 0.5f) * x.transform.position.x).ToList();
                     Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
                     if (n.dir == ArrowDirection.down)
                     {
@@ -472,7 +479,7 @@ public class GamePlayCode : MonoBehaviour
             {
                 if (tabScriptAcc.notesInJudgementZone.Count != 0)
                 {
-                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => -Mathf.Sign((float)TransportedData.handMode - 0.5f) * x.transform.position.x).ToList();
                     Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
                     if (n.dir == ArrowDirection.left)
                     {
@@ -507,7 +514,7 @@ public class GamePlayCode : MonoBehaviour
             {
                 if (tabScriptAcc.notesInJudgementZone.Count != 0)
                 {
-                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+                    List<GameObject> candidatesSorted = tabScriptAcc.notesInJudgementZone.OrderBy(x => -Mathf.Sign((float)TransportedData.handMode - 0.5f) * x.transform.position.x).ToList();
                     Note n = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
                     if (n.dir == ArrowDirection.right)
                     {
@@ -691,7 +698,7 @@ public class GamePlayCode : MonoBehaviour
         effectPos = new Vector3(effectPos.x, effectPos.y, -5f);
         if (tabScript.notesInJudgementZone.Count != 0)
         {
-            List<GameObject> candidatesSorted = tabScript.notesInJudgementZone.OrderBy(x => x.transform.position.x).ToList();
+            List<GameObject> candidatesSorted = tabScript.notesInJudgementZone.OrderBy(x => -Mathf.Sign((float)TransportedData.handMode - 0.5f) * x.transform.position.x).ToList();
             Note note = candidatesSorted[candidatesSorted.Count - 1].GetComponent<Note>();
             Color col = colorDefault;
             if (note.dir == ArrowDirection.no || note.dir == dir)
@@ -783,6 +790,10 @@ public class GamePlayCode : MonoBehaviour
 
     public void SaveRecords()
     {
+        if (score > transportedData.currentSong.songRecord)
+        {
+            TransportedData.scoreDelta = score - transportedData.currentSong.songRecord;
+        }
         transportedData.currentSong.lastTryScore = score;
         PlayerPrefs.SetInt(MyUtitities.scoreSaveFlag + "lastTry__" + transportedData.currentSong.songName, transportedData.currentSong.lastTryScore);
         //DONT DO IT EVERY TIME!!
@@ -803,24 +814,75 @@ public class GamePlayCode : MonoBehaviour
 
     void MoveToMenu()
     {
-        SceneManager.LoadScene("SampleScene");
+        if (inMultiplayer)
+        {
+            if (score > NetworkStatus.hisScore)
+            {
+                NetworkStatus.isActive = false;
+                SceneManager.LoadScene("LANResults");
+            }
+            else if (score < NetworkStatus.hisScore)
+            {
+                NetworkStatus.isActive = false;
+                SceneManager.LoadScene("LANResults1");
+            }
+            else
+            {
+                NetworkStatus.isActive = false;
+                //Ничья
+                SceneManager.LoadScene("LANResults2");
+            }
+        }
+        else
+        {
+            SceneManager.LoadScene("SampleScene");
+        }
     }
 
     void ChangeScore(int value)
     {
+        score = value;
+        te.text = score.ToString();
+        scoreIndicatorT.localPosition = new Vector3((float)score/maxScore, scoreIndicatorT.localPosition.y, scoreIndicatorT.localPosition.z);
+        scoreSladerT.localScale = new Vector3((float)score / maxScore, 1, 1);
         if (inMultiplayer)
         {
-            nV.ChangeScoreServerRpc(value-score);
-            score = value;
+            NetworkStatus.myScore = score;
+            NetworkStatus.SetScoreInterruption(true);
+
+            float myZ = -1;
+            float hisZ = -1;
+            if (NetworkStatus.hisScore > score)
+                myZ = -2;
+            else
+                hisZ = -2;
+            hisScoreSliderT.transform.position = new Vector3(hisScoreSliderT.transform.position.x, hisScoreSliderT.transform.position.y, hisZ);
+            scoreSladerT.transform.position = new Vector3(scoreSladerT.transform.position.x, scoreSladerT.transform.position.y, myZ);
         }
-        else
+    }
+
+
+    public void NET_Change2dPlayerScore()
+    {
+        if (!inMultiplayer)
         {
-            score = value;
-            te.text = score.ToString();
-            scoreIndicatorT.localPosition = new Vector3((float)score/maxScore, scoreIndicatorT.localPosition.y, scoreIndicatorT.localPosition.z);
-            scoreSladerT.localScale = new Vector3((float)score / maxScore, 1, 1);
+            Debug.LogError("Called function NET_Change2dPlayerScore outside of multiplayer.");
+            return;
         }
         
+        
+        hisScoreText.text = NetworkStatus.hisScore.ToString();
+        hisScoreIndicatorT.localPosition = new Vector3((float)NetworkStatus.hisScore / maxScore, hisScoreIndicatorT.localPosition.y, hisScoreIndicatorT.localPosition.z);
+        hisScoreSliderT.localScale = new Vector3((float)NetworkStatus.hisScore / maxScore, 1, 1);
+
+        float myZ = -1;
+        float hisZ = -1;
+        if (NetworkStatus.hisScore > score)
+            myZ = -2;
+        else
+            hisZ = -2;
+        hisScoreSliderT.transform.position = new Vector3(hisScoreSliderT.transform.position.x, hisScoreSliderT.transform.position.y, hisZ);
+        scoreSladerT.transform.position = new Vector3(scoreSladerT.transform.position.x, scoreSladerT.transform.position.y, myZ);
     }
 
     public int GetScore()

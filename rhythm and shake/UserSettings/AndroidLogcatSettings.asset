@@ -3,7 +3,7 @@
     "m_SelectedProcess": {
         "deviceId": "R5CT80JSVGY",
         "name": "com.Kladovka.RhythmAndShake",
-        "processId": 16900,
+        "processId": 14514,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -29,79 +29,151 @@
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.sec.android.app.launcher",
-            "processId": 2860,
+            "processId": 2785,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 29510,
+            "processId": 10489,
             "exited": true
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 29982,
+            "processId": 28857,
             "exited": true
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 30886,
+            "processId": 30123,
             "exited": true
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 31425,
+            "processId": 11205,
             "exited": true
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 31856,
+            "processId": 16873,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 19162,
+            "processId": 24576,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 2725,
+            "processId": 26666,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 6038,
+            "processId": 322,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 7399,
+            "processId": 23452,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 8201,
+            "processId": 5661,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 8810,
+            "processId": 11288,
             "exited": false
         },
         {
             "deviceId": "R5CT80JSVGY",
             "name": "com.Kladovka.RhythmAndShake",
-            "processId": 16900,
+            "processId": 5649,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 12264,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 12804,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 13180,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 13654,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 14246,
+            "exited": false
+        },
+        {
+            "deviceId": "R5CT80JSVGY",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 14514,
+            "exited": false
+        },
+        {
+            "deviceId": "fcd2373a",
+            "name": "com.miui.home",
+            "processId": 2800,
+            "exited": false
+        },
+        {
+            "deviceId": "fcd2373a",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 8166,
+            "exited": true
+        },
+        {
+            "deviceId": "fcd2373a",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 8911,
+            "exited": true
+        },
+        {
+            "deviceId": "fcd2373a",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 11190,
+            "exited": true
+        },
+        {
+            "deviceId": "fcd2373a",
+            "name": "com.android.settings",
+            "processId": 13180,
+            "exited": false
+        },
+        {
+            "deviceId": "fcd2373a",
+            "name": "com.Kladovka.RhythmAndShake",
+            "processId": 12645,
             "exited": false
         }
     ],

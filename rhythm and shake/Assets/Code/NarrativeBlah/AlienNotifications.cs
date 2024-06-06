@@ -6,6 +6,7 @@ using Unity.Notifications.Android;
 
 public class AlienNotifications : MonoBehaviour
 {
+   
     void Start()
     {
         CreatePopUpChannel();
@@ -48,4 +49,5 @@ public class AlienNotifications : MonoBehaviour
 
         AndroidNotificationCenter.SendNotification(notification, "channel_id");
     }
+    
 }

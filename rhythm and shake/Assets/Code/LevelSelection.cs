@@ -6,6 +6,7 @@ using System.Net.WebSockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class LevelSelection : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class LevelSelection : MonoBehaviour
 
     [SerializeField]
     List<Song> songs = new List<Song>();
+    List<string> songIdentifiers = new List<string>();
     int currentSongIndex = 0;
     public static bool currentSongInMultiplayer = false;
 
@@ -56,9 +58,16 @@ public class LevelSelection : MonoBehaviour
 
     [SerializeField]
     GameObject canvas;
-
     [SerializeField]
     GameObject divisionLine;
+    [SerializeField] 
+    GameObject cassetePlayer;
+    [SerializeField]
+    GameObject NETCassetePlayer;
+    [SerializeField]
+    GameObject backToMenuButton;
+    [SerializeField] 
+    GameObject lvlSelectionCanvas;
 
 
     [SerializeField]
@@ -121,9 +130,15 @@ public class LevelSelection : MonoBehaviour
         //Later should expand it
         EnterMenu();
         //ViewSongData();
-
-        PrepareMenuExit();
-
+        if (TransportedData.enableMainMenu)
+        {
+            PrepareMenuExit();
+        }
+        else
+        {
+            GetComponent<MainMenu>().OpenLevelSelect();
+            TransportedData.enableMainMenu = true;
+        }
     }
 
     // Update is called once per frame
@@ -202,6 +217,12 @@ public class LevelSelection : MonoBehaviour
                             tabScripts[currentSongIndex].TapIncrease(true, Color.green);
                             tabScripts[currentSongIndex].TabRotate(currentSongInMultiplayer == true ? -1 : 1);
                             currentSongInMultiplayer = !currentSongInMultiplayer;
+                            cassetePlayer.SetActive(!cassetePlayer.activeSelf);
+                            NETCassetePlayer.SetActive(!NETCassetePlayer.activeSelf);
+                            backToMenuButton.SetActive(!backToMenuButton.activeSelf);
+                            //SHUT DOWN SERVER FROM HERE LATER!
+
+
                             //here we will turn song tab around (Horray, one year passed and we are finally here!)
                             //let's do multiplayer now!
                             //but firstly  _____                
@@ -222,13 +243,29 @@ public class LevelSelection : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.R))
             {
-                Debug.Log("rotating!");
+
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+
+                tabScripts[currentSongIndex].TapIncrease(true, Color.green);
                 tabScripts[currentSongIndex].TabRotate(currentSongInMultiplayer == true ? -1 : 1);
                 currentSongInMultiplayer = !currentSongInMultiplayer;
+                cassetePlayer.SetActive(!cassetePlayer.activeSelf);
+                NETCassetePlayer.SetActive(!NETCassetePlayer.activeSelf);
+                backToMenuButton.SetActive(!backToMenuButton.activeSelf);
+
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
+                //THIS IS A COPY OF A CAKE BLOCK ABOVE FOR PC DEBUG. SO THIS CODE IS TEST ONLY!
             }
 
 
-            if (prevHState == HState.straight && hState == HState.left)
+            if ((!currentSongInMultiplayer) && (prevHState == HState.straight && hState == HState.left))
             {
                 if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f))
                 {
@@ -236,7 +273,7 @@ public class LevelSelection : MonoBehaviour
                 }
             }
 
-            if (prevHState == HState.straight && hState == HState.right)
+            if ((!currentSongInMultiplayer) && (prevHState == HState.straight && hState == HState.right))
             {
                 if (!isCameraMoving || Mathf.Abs(destinationX - myTransform.position.x) < (cameraShift / 4f))
                 {
@@ -266,11 +303,11 @@ public class LevelSelection : MonoBehaviour
     {
         transportedData.currentMenuIndex = currentSongIndex;
         transportedData.currentSong = songs[currentSongIndex];
+        TransportedData.enableMainMenu = false;
         SceneManager.LoadScene("GameplayScene");
     }
 
-    [SerializeField] GameObject cassetePlayer;
-    [SerializeField] GameObject lvlSelectionCanvas;
+    
     public void PrepareMenu()
     {
         GameObject[] tabs = GameObject.FindGameObjectsWithTag("tab");
@@ -311,14 +348,17 @@ public class LevelSelection : MonoBehaviour
 
     public void EnterMenu()
     {
+
+
         sTransition.FadeIn();
         currentSongIndex = transportedData.currentMenuIndex;
+        transportedData.currentSong = songs[currentSongIndex];
         //set camera on needed position
         myTransform.position = new Vector3(cameraShift * currentSongIndex, myTransform.position.y, myTransform.position.z);
+        ViewSongData();
         SongAuthorText.text = transportedData.currentSong.authorName;
         SongNameText.text = transportedData.currentSong.songName;
         
-        ViewSongData();
         //later we will move it to view song data
         /*
         if(bestScore >= 491) 
@@ -425,17 +465,26 @@ public class LevelSelection : MonoBehaviour
         //later we need to load record from here and to here
     }
 
+    //this is a bottleneck function
+    //it should work better but it doesn't as jsons & wavs have obscure architecture
     void AddCustomSongs()
     {
-        foreach (AudioInfo audioI in transportedData.deletctedAudioFiles)
+        foreach (AudioInfo audioI in transportedData.detectedAudioFiles)
         {
-            string audioName = audioI.name.Replace(".wav", "");
+            string audioName = audioI.name;
+            
+            if(audioName.Contains(".wav")) 
+                audioName = audioName.Replace(".wav", "");
+            else 
+                audioName = audioName.Replace(".mp3", "");
+
             if (transportedData.detectedJsonFiles.Exists(x => (x.name).Replace(".json", "") == audioName))
             {
                 Song s = new Song();
                 MyUtitities.LoadSongFromJSON(ref s, transportedData.detectedJsonFiles.Find(x => (x.name).Replace(".json", "") == audioName).json);
                 s.audio = audioI.clip;
                 songs.Add(s);
+                songIdentifiers.Add(audioI.name);
                 //later may be add custom album covers
                 Sprite albumCover = MyUtitities.LoadNewSprite(Application.persistentDataPath + "/covers/" + audioName + ".jpg");
                 if(albumCover == null)
@@ -456,9 +505,32 @@ public class LevelSelection : MonoBehaviour
     }
 
 
-    public string GetCurrentSongWAVAddress()
+    public void AddCustomSong(Song s, string songIdentifier)
     {
-        return Application.persistentDataPath + "/songs/" + songs[currentSongIndex].songName+".wav";
+        songs.Add(s);
+        songIdentifiers.Add(songIdentifier);
+        GameObject tabInstance = Instantiate(tabPrefab, new Vector3((songs.Count - 1) * 3.7f, 1.9f, -1), Quaternion.identity);
+        tabScripts.Add(tabInstance.GetComponent<TabScript>());
+    }
+
+
+    public string GetCurrentSongAudioAddress()
+    {
+        string address = Application.persistentDataPath + "/songs/" + songs[currentSongIndex].songName;
+        if (File.Exists(address + ".mp3"))
+            return address + ".mp3";
+        else
+            return address + ".wav";
+    }
+
+    public string GetCurrentSongJSONAddress() 
+    {
+        return Application.persistentDataPath + "/" + songs[currentSongIndex].songName + ".json";
+    }
+
+    public Song GetCurrentSong() 
+    {
+        return songs[currentSongIndex];
     }
 
 }

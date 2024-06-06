@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 public enum ArrowDirection {no, up, down, left, right};
 
+public enum HandMode {left, right};
+
 [System.Serializable]
 public struct SongItem { public float time; public ArrowDirection dir; }
 
@@ -17,6 +19,10 @@ public class NoteTimeAndType
 
 public class SongGenerator : MonoBehaviour
 {
+
+    [SerializeField]
+    Transform SongLayountT;
+
     [SerializeField]
     GameObject pauseMenu;
 
@@ -64,12 +70,11 @@ public class SongGenerator : MonoBehaviour
 
     [SerializeField]
     bool inMultiplayer = false;
+    public static bool inTutorial = false;
 
     [SerializeField]
     TransportedData td;
 
-    [SerializeField]
-    Vector3 judgementPosition = Vector3.zero;
 
     int maxScoreNow;
     int maxComboNow;
@@ -77,11 +82,34 @@ public class SongGenerator : MonoBehaviour
     double trackTime = 0;
     double timer = 0;
 
+    private void Awake()
+    {
+        if (PlayerPrefs.HasKey("HAND"))
+        {
+            TransportedData.handMode = (HandMode)PlayerPrefs.GetInt("HAND");
+        }
+
+    }
 
     void Start()
     {
+        
+                
+        SongLayountT.position = Vector3.zero;
+
+        if (GetComponent<BasicDialing>() != null)
+            inTutorial = true;
+
         gameplay = GetComponent<GamePlayCode>();
-        if (!inMultiplayer)
+        if (inMultiplayer)
+        {
+            //
+        }
+        else if (inTutorial)
+        { 
+            //
+        }
+        else
         {
             song.clip = td.currentSong.audio;
             track1 = td.currentSong.track1;
@@ -98,19 +126,34 @@ public class SongGenerator : MonoBehaviour
         gameplay.ExitGamePlay();
     }
 
+    public void PauseSongWithButton()
+    {
+        PauseSong();
+    }
 
-    public void PauseSong()
+    public float PauseSong()
     {
         isPlaying = false;
         song.Pause();
-        pauseMenu.SetActive(true);
+        if(!inMultiplayer)
+            pauseMenu.SetActive(true);
+        return song.time;
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause && !inMultiplayer)
+        {
+            PauseSong();
+        }
     }
 
     public void ResumeSong()
     {
         isPlaying = true;
         song.UnPause();
-        pauseMenu.SetActive(false);
+        if(!inMultiplayer)
+            pauseMenu.SetActive(false);
     }
 
     public void ExitToMenu()
@@ -134,11 +177,27 @@ public class SongGenerator : MonoBehaviour
         isPlaying = true;
     }
 
+    public void NET_InitSong()
+    {
+        song.clip = NetworkStatus.song.audio;
+        track1 = NetworkStatus.song.track1;
+        track2 = NetworkStatus.song.track2;
+        trackAcc = NetworkStatus.song.trackAcc;
+
+    }
+    public void NET_CorrectSong(float time)
+    {
+        //do corrections after pause
+        song.time = time;
+        SongLayountT.position = new Vector3(-Mathf.Sign((float)TransportedData.handMode - 0.5f) * song.time * trackVelocity, 0, 0);
+    }
+
 
     private void Update()
     {
         if (isPlaying)
         {
+            SongLayountT.position = new Vector3(-Mathf.Sign((float)TransportedData.handMode - 0.5f) * song.time * trackVelocity, 0, 0);
             timer += Time.deltaTime;
             if (timer >= trackTime)
             {
@@ -165,8 +224,20 @@ public class SongGenerator : MonoBehaviour
         List<NoteTimeAndType> scoreFlags = new List<NoteTimeAndType>();
         for (int i = 0; i < track1.Count; ++i)
         {
-            Vector3 notePosition = new Vector3(judgementPosition.x, 0, 0) - new Vector3((track1[i].time + delay) * trackVelocity, 0, -1);
-            GenerateNote(notePosition, track1[i].dir);
+            Vector3 notePosition = new Vector3(Mathf.Sign((float)TransportedData.handMode - 0.5f) * (-0.1f + (track1[i].time) * trackVelocity), 0, -1);
+            if (TransportedData.handMode == HandMode.right)
+            {
+                if (track1[i].dir == ArrowDirection.left)
+                    GenerateNote(notePosition, ArrowDirection.right);
+                else if (track1[i].dir == ArrowDirection.right)
+                    GenerateNote(notePosition, ArrowDirection.left);
+                else
+                    GenerateNote(notePosition, track1[i].dir);
+            }
+            else
+            {
+                GenerateNote(notePosition, track1[i].dir);
+            }
             NoteTimeAndType n = new NoteTimeAndType();
             n.time = track1[i].time;
             n.type = NoteType.simple;
@@ -174,8 +245,20 @@ public class SongGenerator : MonoBehaviour
         }
         for (int i = 0; i < track2.Count; ++i)
         {
-            Vector3 notePosition = new Vector3(judgementPosition.x, -3.2f, 0) - new Vector3((track2[i].time + delay) * trackVelocity, 0, -1);
-            GenerateNote(notePosition, track2[i].dir);
+            Vector3 notePosition = new Vector3(0, -3.2f, 0) + new Vector3(Mathf.Sign((float)TransportedData.handMode - 0.5f) * (-0.1f + (track2[i].time) * trackVelocity), 0, -1);
+            if (TransportedData.handMode == HandMode.right)
+            {
+                if (track2[i].dir == ArrowDirection.left)
+                    GenerateNote(notePosition, ArrowDirection.right);
+                else if (track2[i].dir == ArrowDirection.right)
+                    GenerateNote(notePosition, ArrowDirection.left);
+                else
+                    GenerateNote(notePosition, track2[i].dir);
+            }
+            else
+            {
+                GenerateNote(notePosition, track2[i].dir);
+            }
             NoteTimeAndType n = new NoteTimeAndType();
             n.time = track2[i].time;
             n.type = NoteType.simple;
@@ -183,8 +266,20 @@ public class SongGenerator : MonoBehaviour
         }
         for (int i = 0; i < trackAcc.Count; ++i)
         {
-            Vector3 notePosition = new Vector3(judgementPosition.x, 2.7f, 0) - new Vector3((trackAcc[i].time + delay) * trackVelocity, 0, -1);
-            GenerateArrow(notePosition, trackAcc[i].dir);
+            Vector3 notePosition = new Vector3(0, 2.7f, 0) + new Vector3(Mathf.Sign((float)TransportedData.handMode - 0.5f) * (-0.1f + (trackAcc[i].time) * trackVelocity), 0, -1);
+            if (TransportedData.handMode == HandMode.right)
+            {
+                if (trackAcc[i].dir == ArrowDirection.left)
+                    GenerateArrow(notePosition, ArrowDirection.right);
+                else if (trackAcc[i].dir == ArrowDirection.right)
+                    GenerateArrow(notePosition, ArrowDirection.left);
+                else
+                    GenerateArrow(notePosition, trackAcc[i].dir);
+            }
+            else
+            {
+                GenerateArrow(notePosition, trackAcc[i].dir);
+            }
             NoteTimeAndType n = new NoteTimeAndType();
             n.time = trackAcc[i].time;
             n.type = NoteType.accNote;
@@ -225,7 +320,7 @@ public class SongGenerator : MonoBehaviour
     }
 
 
-    void GenerateNote(Vector2 position, ArrowDirection dir)
+    public void GenerateNote(Vector2 position, ArrowDirection dir)
     {
         GameObject notePrefab;
         switch (dir)
@@ -236,8 +331,10 @@ public class SongGenerator : MonoBehaviour
             case ArrowDirection.right: notePrefab = rightNotePrefab; break;
             default: notePrefab = classicNotePrefab; break;
         }
-        GameObject noteInstance = Instantiate(notePrefab, position, Quaternion.identity);
+        GameObject noteInstance = Instantiate(notePrefab, position, Quaternion.identity, SongLayountT);
         Note note = noteInstance.GetComponent<Note>();
+        
+        
         note.velocity = trackVelocity;
         note.dir = dir;
     }
@@ -252,7 +349,7 @@ public class SongGenerator : MonoBehaviour
             case ArrowDirection.left: arrowPrefab = leftArrowPrefab; break;
             default: arrowPrefab = rightArrowPrefab; break;
         }
-        GameObject arrowInstance = Instantiate(arrowPrefab, position, arrowPrefab.transform.rotation);
+        GameObject arrowInstance = Instantiate(arrowPrefab, position, arrowPrefab.transform.rotation, SongLayountT);
         Note n = arrowInstance.GetComponent<Note>();
         n.velocity = trackVelocity;
     }

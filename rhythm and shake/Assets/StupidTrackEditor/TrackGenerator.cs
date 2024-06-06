@@ -82,9 +82,9 @@ public class TrackGenerator : MonoBehaviour
     {
         dropdown.ClearOptions();
         ddOptions = new List<string>();
-        for (int i = 0; i < td.deletctedAudioFiles.Count; ++i)
+        for (int i = 0; i < td.detectedAudioFiles.Count; ++i)
         {
-            ddOptions.Add(td.deletctedAudioFiles[i].name);
+            ddOptions.Add(td.detectedAudioFiles[i].name);
         }
         dropdown.AddOptions(ddOptions);
         audioSource = GetComponent<AudioSource>();
@@ -498,6 +498,19 @@ public class TrackGenerator : MonoBehaviour
         }
     }
 
+    public void PressBackButton()
+    {
+        if (isRecording)
+        {
+            audioSource.Stop();
+            SceneManager.LoadScene("SampleScene");
+        }
+        else
+        {
+            SceneManager.LoadScene("SampleScene");
+        }
+    }
+
     void StartTrackRecording()
     {
         track.track1.Clear();
@@ -505,8 +518,8 @@ public class TrackGenerator : MonoBehaviour
         track.trackAcc.Clear();
         timer = 0;
         isRecording = true;
-        audioSource.clip = td.deletctedAudioFiles[dropdown.value].clip;
-        track.songName = td.deletctedAudioFiles[dropdown.value].name.Replace(".wav", "");
+        audioSource.clip = td.detectedAudioFiles[dropdown.value].clip;
+        track.songName = td.detectedAudioFiles[dropdown.value].name.Replace(".wav", "");
         audioSource.Play();
     }
 
